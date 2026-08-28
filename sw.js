@@ -1,7 +1,7 @@
 /* Meu Ministério — service worker
    Troque a versão sempre que publicar uma alteração: isso avisa o app
    e limpa o cache antigo automaticamente. */
-const VERSAO = 'meuministerio-v1.4.0';
+const VERSAO = 'meuministerio-v1.5.0';
 const CASCA = VERSAO + '-casca';
 const EXTERNO = VERSAO + '-externo';
 
