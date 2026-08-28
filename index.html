@@ -282,7 +282,9 @@ p{margin:0}
 .caps-grade{display:grid;grid-template-columns:repeat(6,1fr);gap:7px}
 @media (max-width:420px){.caps-grade{grid-template-columns:repeat(5,1fr)}}
 .cap-btn{aspect-ratio:1;border-radius:var(--r2);background:var(--surf);border:var(--borda);font-family:var(--fu);font-weight:700;font-size:.92rem;display:grid;place-items:center}
-.cap-btn.marcado{background:var(--ac);color:var(--ac-ink);border-color:transparent}
+.cap-btn.marcado{border-color:var(--ac);border-width:2px;color:var(--ac)}
+.cap-btn.lido{background:var(--ac);color:var(--ac-ink);border-color:transparent}
+.cap-btn.lido.marcado{background:var(--ac);color:var(--ac-ink);border-color:var(--ac-ink)}
 
 /* ---- calendário (relatório) ---- */
 .mes-topo{display:flex;align-items:center;justify-content:space-between;margin:4px 0 14px}
@@ -304,6 +306,7 @@ p{margin:0}
 .cel.n3{background:color-mix(in srgb, var(--ac) 70%, var(--ac2))}
 .cel.n4{background:var(--ac)}
 .cel.n3 .n,.cel.n4 .n,.cel.n3 .h,.cel.n4 .h{color:var(--ac-ink)}
+.cel.sel .n,.cel.sel .h{color:var(--ac-ink)!important}
 .escala{display:flex;align-items:center;gap:5px;font-family:var(--fu);font-size:.66rem;opacity:.6;margin:10px 0;flex-wrap:wrap}
 .escala i{width:14px;height:9px;border-radius:3px;background:var(--surf2);flex:none}
 .escala i.n1{background:var(--ac2)}
@@ -406,12 +409,12 @@ p{margin:0}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
 window.__FIREBASE_CONFIG__ = {
-  apiKey: "AIzaSyAcYjgrvJ2u_Zkjss8LKJDSl-QW1aIAw3g",
-  authDomain: "meu-ministerio-36fb0.firebaseapp.com",
-  projectId: "meu-ministerio-36fb0",
-  storageBucket: "meu-ministerio-36fb0.firebasestorage.app",
-  messagingSenderId: "633344411980",
-  appId: "1:633344411980:web:395910353cc952b48527e9"
+  apiKey: "COLOQUE_AQUI_A_SUA_API_KEY",
+  authDomain: "SEU-PROJETO.firebaseapp.com",
+  projectId: "SEU-PROJETO",
+  storageBucket: "SEU-PROJETO.firebasestorage.app",
+  messagingSenderId: "000000000000",
+  appId: "1:000000000000:web:0000000000000000000000"
 };
 </script>
 
@@ -480,6 +483,24 @@ window.__FIREBASE_CONFIG__ = {
   ].map(function (l) { return { n: l[0], s: l[1], c: l[2], g: l[3] }; });
   function livroPorNome(n) { return BIBLIA.filter(function (l) { return l.n === n; })[0] || null; }
   function linkCapitulo(livro, cap) { return BASE_JW + encodeURIComponent(livro.s) + '/' + cap + '/'; }
+  function capituloLido(nomeLivro, cap) { var arr = D.progresso[nomeLivro]; return !!arr && arr.indexOf(cap) >= 0; }
+  function toggleCapituloLido(nomeLivro, cap) {
+    var arr = D.progresso[nomeLivro] || [];
+    var ix = arr.indexOf(cap);
+    if (ix >= 0) arr.splice(ix, 1); else arr.push(cap);
+    D.progresso[nomeLivro] = arr;
+    salva();
+  }
+  function progressoLivro(livro) {
+    var arr = D.progresso[livro.n] || [];
+    var lidos = arr.filter(function (c) { return c >= 1 && c <= livro.c; }).length;
+    return { lidos: lidos, total: livro.c, pct: livro.c ? Math.round(lidos * 100 / livro.c) : 0 };
+  }
+  function progressoTotal() {
+    var lidos = 0, total = 0;
+    BIBLIA.forEach(function (l) { var p = progressoLivro(l); lidos += p.lidos; total += p.total; });
+    return { lidos: lidos, total: total, pct: total ? Math.round(lidos * 100 / total) : 0 };
+  }
 
   /* ---------- abas: ícones, rótulos e ordem ---------- */
   var NAVDEF = {
@@ -506,6 +527,7 @@ window.__FIREBASE_CONFIG__ = {
     return {
       cfg: { cor: 'azul', modo: 'claro', tamanho: 'normal', fonte: 'padrao', nome: '', ordem: ORDEM_PADRAO.slice() },
       marcador: { livro: '', capitulo: 0, quando: 0 },
+      progresso: {},
       // registros achatados, no mesmo padrão do Caderno: d_<iso> (dia),
       // est_<mes> (estudos dirigidos), cred_<categoria>_<mes> (crédito manual)
       // e um único registro 'config' (meta, categorias de crédito ativas).
@@ -517,6 +539,8 @@ window.__FIREBASE_CONFIG__ = {
     try { D = JSON.parse(LS.getItem(KEY)); } catch (e) { D = null; }
     if (!D || !D.cfg) D = padrao();
     if (!D.marcador) D.marcador = { livro: '', capitulo: 0, quando: 0 };
+    if (!D.progresso || typeof D.progresso !== 'object' || Array.isArray(D.progresso)) D.progresso = {};
+    Object.keys(D.progresso).forEach(function (k) { if (!Array.isArray(D.progresso[k])) delete D.progresso[k]; });
     if (!D.cfg.fonte) D.cfg.fonte = 'padrao';
     if (!Array.isArray(D.relatorio)) D.relatorio = [];
     ['revisitas', 'estudos', 'notas', 'listas', 'lembretes', 'compromissos'].forEach(function (k) { if (!Array.isArray(D[k])) D[k] = []; });
@@ -679,6 +703,8 @@ window.__FIREBASE_CONFIG__ = {
     var horas = minutosDoMes(chaveMes);
     var proximasRev = D.revisitas.filter(function (r) { return r.retorno; })
       .sort(function (a, b) { return a.retorno.localeCompare(b.retorno); }).slice(0, 4);
+    var proximosComp = D.compromissos.filter(function (c) { return c.data && c.data >= hojeISO(); })
+      .sort(function (a, b) { return a.data.localeCompare(b.data); }).slice(0, 4);
     var pendLem = D.lembretes.filter(function (l) { return !l.feito; }).sort(function (a, b) { return (a.quando || '').localeCompare(b.quando || ''); });
 
     var s = '<div class="saudacao"><p class="eyebrow">' + esc(diaSemana(hojeISO())) + ' · ' + esc(dtExt(hojeISO())) + '</p>' +
@@ -710,6 +736,11 @@ window.__FIREBASE_CONFIG__ = {
     else proximasRev.forEach(function (r) { s += cardRevisita(r); });
     s += '</div>';
 
+    s += '<div class="secao"><div class="secao-topo"><h2>Próximos compromissos</h2><span class="link" data-vista="agenda">Ver agenda</span></div>';
+    if (!proximosComp.length) s += '<p class="dica">Nenhum compromisso agendado.</p>';
+    else proximosComp.forEach(function (c) { s += cardCompromisso(c); });
+    s += '</div>';
+
     if (pendLem.length) {
       s += '<div class="secao"><div class="secao-topo"><h2>Lembretes</h2><span class="link" data-vista="lembretes">Ver todos</span></div>' +
         pendLem.slice(0, 3).map(cardLembrete).join('') + '</div>';
@@ -735,6 +766,9 @@ window.__FIREBASE_CONFIG__ = {
     if (bibliaLivroAtual) return vBibliaCapitulos(livroPorNome(bibliaLivroAtual));
 
     var s = '<div class="cabeca"><h1>Bíblia</h1></div>';
+    var pgTot = progressoTotal();
+    s += '<div class="secao" style="margin-bottom:14px"><div class="secao-topo"><h2>Progresso de leitura</h2><span class="meta">' + pgTot.lidos + '/' + pgTot.total + ' cap. · ' + pgTot.pct + '%</span></div>' +
+      '<div class="bar"><i style="width:' + pgTot.pct + '%"></i></div></div>';
     if (D.marcador && D.marcador.livro) {
       s += '<div class="marcador-card" data-act="continuar-leitura">' +
         '<span class="icobiblia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 6.2c-1.9-1.3-4.2-1.7-7-1.2v13c2.8-.5 5.1-.1 7 1.2V6.2z"/><path d="M12 6.2c1.9-1.3 4.2-1.7 7-1.2v13c-2.8-.5-5.1-.1-7 1.2V6.2z"/></svg></span>' +
@@ -748,7 +782,8 @@ window.__FIREBASE_CONFIG__ = {
 
     function grade(arr) {
       return '<div class="livros">' + arr.map(function (l) {
-        return '<button class="livro-btn" data-act="abrir-livro" data-livro="' + esc(l.n) + '"><span>' + esc(l.n) + '</span><span class="n">' + l.c + ' cap.</span></button>';
+        var p = progressoLivro(l);
+        return '<button class="livro-btn" data-act="abrir-livro" data-livro="' + esc(l.n) + '"><span>' + esc(l.n) + '</span><span class="n">' + (p.lidos ? p.pct + '% lido' : l.c + ' cap.') + '</span></button>';
       }).join('') + '</div>';
     }
     if (heb.length) s += '<p class="grupo">Escrituras Hebraico-Aramaicas</p>' + grade(heb);
@@ -759,25 +794,47 @@ window.__FIREBASE_CONFIG__ = {
 
   function vBibliaCapitulos(livro) {
     if (!livro) { bibliaLivroAtual = null; return vBiblia(); }
+    var pg = progressoLivro(livro);
     var s = '<button class="voltar-cat" data-act="fechar-livro">‹ Bíblia</button>' +
       '<div class="cabeca"><h1>' + esc(livro.n) + '</h1></div>' +
-      '<p class="dica" style="margin-bottom:14px">Toque num capítulo para marcar como "onde parei" e abrir a leitura no jw.org.</p>' +
+      '<div class="secao" style="margin:0 0 12px"><div class="secao-topo"><h2 style="font-size:.9rem">Progresso</h2><span class="meta">' + pg.lidos + '/' + pg.total + ' · ' + pg.pct + '%</span></div><div class="bar"><i style="width:' + pg.pct + '%"></i></div></div>' +
+      '<p class="dica" style="margin-bottom:14px">Toque num capítulo para marcar "onde parei", marcar como lido ou abrir no jw.org quando você quiser.</p>' +
       '<div class="caps-grade">';
     var marcado = D.marcador && D.marcador.livro === livro.n ? D.marcador.capitulo : 0;
     for (var c = 1; c <= livro.c; c++) {
-      s += '<button class="cap-btn' + (c === marcado ? ' marcado' : '') + '" data-act="abrir-capitulo" data-livro="' + esc(livro.n) + '" data-cap="' + c + '">' + c + '</button>';
+      var lido = capituloLido(livro.n, c);
+      s += '<button class="cap-btn' + (c === marcado ? ' marcado' : '') + (lido ? ' lido' : '') + '" data-act="abrir-capitulo" data-livro="' + esc(livro.n) + '" data-cap="' + c + '">' + c + '</button>';
     }
     s += '</div>';
     return s;
   }
 
   function abrirLivro(nome) { bibliaLivroAtual = nome; bibliaFiltro = ''; render(); window.scrollTo(0, 0); }
-  function abrirCapitulo(nomeLivro, cap) {
+  function abreAcaoCapitulo(nomeLivro, cap) {
     var livro = livroPorNome(nomeLivro); if (!livro) return;
-    D.marcador = { livro: livro.n, capitulo: cap, quando: agoraMs() };
-    salva(); render();
-    toast('Marcador: ' + livro.n + ' ' + cap + '.');
-    try { window.open(linkCapitulo(livro, cap), '_blank', 'noopener'); } catch (e) { }
+    var lido = capituloLido(nomeLivro, cap);
+    var ehMarcador = D.marcador && D.marcador.livro === nomeLivro && D.marcador.capitulo === cap;
+    var corpo = '<p class="dica" style="margin-bottom:4px">' + esc(nomeLivro) + ' ' + cap + '</p>';
+    abreFolha(nomeLivro + ' ' + cap, corpo,
+      '<button class="btn ghost" data-fechar>Fechar</button>' +
+      '<button class="btn ghost" id="ac-marcador">' + (ehMarcador ? 'É o "onde parei" ✓' : 'Marcar "onde parei"') + '</button>' +
+      '<button class="btn ghost" id="ac-lido">' + (lido ? 'Desmarcar lido' : 'Marcar como lido') + '</button>' +
+      '<button class="btn" id="ac-abrir">Abrir no jw.org</button>');
+    var btMarc = $('#ac-marcador');
+    if (!ehMarcador) btMarc.onclick = function () {
+      D.marcador = { livro: livro.n, capitulo: cap, quando: agoraMs() };
+      salva(); fechaFolha(); render();
+      toast('Marcador: ' + livro.n + ' ' + cap + '.');
+    }; else btMarc.disabled = true;
+    $('#ac-lido').onclick = function () {
+      toggleCapituloLido(livro.n, cap);
+      fechaFolha(); render();
+      toast(lido ? 'Capítulo desmarcado.' : 'Capítulo marcado como lido.');
+    };
+    $('#ac-abrir').onclick = function () {
+      try { window.open(linkCapitulo(livro, cap), '_blank', 'noopener'); } catch (e) { }
+      fechaFolha();
+    };
   }
   function continuarLeitura() {
     if (!D.marcador || !D.marcador.livro) return;
@@ -936,16 +993,17 @@ window.__FIREBASE_CONFIG__ = {
         '</div>';
     }
 
-    s += '<div class="secao"><div class="dupla">' +
+    s += '<div class="secao"><div class="form"><div class="dupla">' +
       campo('Meta do mês', '<select id="rel-meta">' + METAS.map(function (m) { return '<option value="' + m[0] + '"' + (m[0] === metaCod ? ' selected' : '') + '>' + esc(m[1]) + '</option>'; }).join('') + '</select>') +
       campo('Estudos bíblicos dirigidos no mês', '<div class="contador"><button type="button" data-act="rel-estudos-menos">−</button><input type="number" min="0" max="99" id="rel-estudos" value="' + estudosDoMes(relMes) + '"><button type="button" data-act="rel-estudos-mais">+</button></div>') +
-      '</div></div>';
+      '</div></div></div>';
 
     s += '<div class="secao"><div class="secao-topo"><h2>Créditos e abonos</h2></div>' +
       '<p class="dica">Marque as categorias que você usa. Não entram no total do mês — aparecem à parte. As horas lançadas nos dias somam aqui automaticamente.</p>' +
       '<div class="linha-acoes" style="margin-top:10px">' + CATS_CREDITO.map(function (c) {
         return '<button class="chip' + (catsAtivas.indexOf(c[0]) >= 0 ? ' on' : '') + '" data-act="rel-cred-toggle" data-cat="' + c[0] + '">' + esc(c[1]) + '</button>';
       }).join('') + '</div>';
+    s += '<div class="form">';
     if (catsAtivas.indexOf('outro') >= 0) {
       s += '<div style="margin-top:10px">' + campo('Nome da categoria "Outros"', '<input type="text" id="rel-cred-nome" placeholder="Ex.: Construção extra" value="' + esc(cfg.credNomeOutro || '') + '">') + '</div>';
     }
@@ -960,7 +1018,7 @@ window.__FIREBASE_CONFIG__ = {
           '</div>';
       }).join('');
     }
-    s += '</div>';
+    s += '</div></div>';
 
     s += '<button class="btn ghost" style="width:100%;margin-top:18px" data-act="abrir-mensagem-mes">Gerar mensagem do mês</button>';
 
@@ -1473,7 +1531,17 @@ window.__FIREBASE_CONFIG__ = {
     } catch (e) { FIREBASE_OK = false; }
   }
 
-  function docPayload() { return { marcador: D.marcador, relatorio: D.relatorio, revisitas: D.revisitas, estudos: D.estudos, notas: D.notas, listas: D.listas, lembretes: D.lembretes, compromissos: D.compromissos, atualizadoEm: agoraMs() }; }
+  function docPayload() { return { marcador: D.marcador, progresso: D.progresso, relatorio: D.relatorio, revisitas: D.revisitas, estudos: D.estudos, notas: D.notas, listas: D.listas, lembretes: D.lembretes, compromissos: D.compromissos, atualizadoEm: agoraMs() }; }
+  function mesclarProgresso(local, remoto) {
+    var m = {};
+    Object.keys(local || {}).forEach(function (k) { m[k] = local[k].slice(); });
+    Object.keys(remoto || {}).forEach(function (k) {
+      var atual = m[k] || [];
+      (remoto[k] || []).forEach(function (c) { if (atual.indexOf(c) < 0) atual.push(c); });
+      m[k] = atual;
+    });
+    return m;
+  }
   function mesclarArr(local, remoto) {
     var m = {};
     [].concat(local || [], remoto || []).forEach(function (o) {
@@ -1486,6 +1554,7 @@ window.__FIREBASE_CONFIG__ = {
   function aplicarRemoto(remote) {
     if (!remote) return;
     if (remote.marcador && (remote.marcador.quando || 0) > (D.marcador.quando || 0)) D.marcador = remote.marcador;
+    D.progresso = mesclarProgresso(D.progresso, remote.progresso);
     D.relatorio = mesclarArr(D.relatorio, remote.relatorio);
     D.revisitas = mesclarArr(D.revisitas, remote.revisitas);
     D.estudos = mesclarArr(D.estudos, remote.estudos);
@@ -1713,6 +1782,13 @@ window.__FIREBASE_CONFIG__ = {
     s += '<div class="secao"><div class="secao-topo"><h2>' + esc(diaSemana(diaAgenda) + ', ' + dtExt(diaAgenda)) + '</h2></div>' + doDiaAgenda(diaAgenda) + '</div>';
     return s;
   }
+  function cardCompromisso(c) {
+    return '<article class="cartao" data-act="abrir-compromisso" data-id="' + c.id + '">' +
+      '<div class="cartao-txt"><p class="meta">' + esc(dt(c.data)) + (c.tipo ? ' · ' + esc(c.tipo) : '') + '</p>' +
+      '<h3>' + esc(c.titulo || 'Sem título') + '</h3>' +
+      (c.nota ? '<p class="trecho">' + esc(c.nota) + '</p>' : '') +
+      '</div></article>';
+  }
   function doDiaAgenda(iso) {
     var s = '';
     D.estudos.filter(function (e) { return e.data === iso; }).forEach(function (e) { s += cardEstudo(e); });
@@ -1771,7 +1847,7 @@ window.__FIREBASE_CONFIG__ = {
 
       case 'abrir-livro': abrirLivro(a.dataset.livro); break;
       case 'fechar-livro': bibliaLivroAtual = null; render(); break;
-      case 'abrir-capitulo': abrirCapitulo(a.dataset.livro, Number(a.dataset.cap)); break;
+      case 'abrir-capitulo': abreAcaoCapitulo(a.dataset.livro, Number(a.dataset.cap)); break;
       case 'continuar-leitura': continuarLeitura(); break;
 
       case 'rel-mes': { var pmm = relMes.split('-').map(Number); var dtm = new Date(pmm[0], pmm[1] - 1 + Number(a.dataset.d), 1); relMes = dtm.getFullYear() + '-' + String(dtm.getMonth() + 1).padStart(2, '0'); render(); break; }

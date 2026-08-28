@@ -12,10 +12,13 @@ livre da Bíblia é nova neste app.
 ## O que tem dentro
 
 - **Bíblia** — os 66 livros, organizados como nas Escrituras Hebraico-Aramaicas
-  e Gregas Cristãs. Toque num capítulo para marcar como "onde parei" e abrir
-  a leitura direto na biblioteca do jw.org, numa aba nova. Este app **não**
-  copia texto bíblico nenhum — ele só guarda em qual capítulo você está e
-  leva você até lá.
+  e Gregas Cristãs, com progresso de leitura por livro e no total (capítulos
+  lidos, barra e porcentagem). Toque num capítulo e escolha o que fazer:
+  marcar como "onde parei", marcar/desmarcar como lido, ou abrir a leitura
+  na biblioteca do jw.org — só quando você tocar em "Abrir no jw.org" é que
+  uma aba nova é aberta; nada abre sozinho. Este app **não** copia texto
+  bíblico nenhum — ele só guarda seu progresso e leva você até lá quando
+  você pedir.
 - **Ministério** — um hub com três telas, portadas com todos os campos e
   cálculos do Caderno — Meu Estudo Pessoal:
   - *Relatório de Campo*: toque num dia do calendário para lançar horas,
@@ -52,9 +55,9 @@ livre da Bíblia é nova neste app.
   configurável.
 - **Conta e sincronização (opcional)** — ao entrar com e-mail/senha ou
   Google, Relatório, Revisitas, Estudo, Notas, Listas, Lembretes,
-  compromissos da Agenda e o marcador da Bíblia passam a sincronizar entre
-  os aparelhos onde você estiver logado. Sem conta, tudo continua
-  funcionando normalmente, só neste aparelho.
+  compromissos da Agenda, o marcador e o progresso de leitura da Bíblia
+  passam a sincronizar entre os aparelhos onde você estiver logado. Sem
+  conta, tudo continua funcionando normalmente, só neste aparelho.
 
 ## Navegação
 
