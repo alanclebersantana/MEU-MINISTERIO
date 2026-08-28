@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Cada pessoa só lê e escreve o próprio documento, guardado com o
+    // mesmo id da sua conta (uid). Ninguém enxerga os dados de outra conta.
+    match /meuministerio_usuarios/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
