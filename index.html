@@ -81,8 +81,6 @@ p{margin:0}
 
 /* ---- casca ---- */
 .app{min-height:100vh;display:flex;flex-direction:column;padding-bottom:24px}
-.topo{order:-3}
-.nav{order:-2}
 .topo{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;
   gap:12px;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;background:var(--topo-bg);color:var(--topo-ink);
   border-bottom:var(--topo-borda);backdrop-filter:blur(10px)}
@@ -102,16 +100,6 @@ p{margin:0}
 .vista.anima-dir{animation:entraDaEsquerda .24s ease}
 @keyframes entraDaDireita{from{transform:translateX(26px);opacity:.25}to{transform:none;opacity:1}}
 @keyframes entraDaEsquerda{from{transform:translateX(-26px);opacity:.25}to{transform:none;opacity:1}}
-
-.nav{position:sticky;top:var(--topo-h);left:0;right:0;z-index:30;display:flex;gap:6px;height:auto;
-  overflow-x:auto;padding:8px 12px;background:var(--topo-bg);border:0;backdrop-filter:blur(10px);
-  scrollbar-width:none;-webkit-overflow-scrolling:touch}
-.nav::-webkit-scrollbar{display:none}
-.nav button{flex:none;display:flex;flex-direction:row;align-items:center;gap:7px;padding:8px 14px;border-radius:999px;
-  background:var(--surf);border:1px solid var(--linha);color:var(--nav-ink);opacity:.7;
-  font-family:var(--fu);font-size:.8rem;font-weight:700;letter-spacing:.02em}
-.nav button svg{width:17px;height:17px}
-.nav button.on{opacity:1;background:var(--ac);color:var(--ac-ink);border-color:transparent;box-shadow:0 3px 12px rgba(var(--acRGB),.3)}
 
 /* ---- textos e cabeçalhos ---- */
 .eyebrow{font-family:var(--fu);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;opacity:.55}
@@ -376,26 +364,169 @@ html[data-modo=claro] .form input,html[data-modo=claro] .form select,html[data-m
 .pt-sync.off i{background:var(--ink2)}
 .linha-divisoria{border:0;border-top:var(--borda-fina);margin:6px 0}
 
-@media (min-width:900px){.app{padding-bottom:0}}
+/* =====================================================================
+   LAYOUT 2.0 — menu inferior, Relatório como tela inicial (calendário),
+   crédito de horas destacado, lembretes minimalistas.
+   ===================================================================== */
+html{--nav-alt:68px;--cr:#C67C20;--cr2:rgba(198,124,32,.15);--cr-forte:#94591A}
+html[data-cor=ambar]{--cr:#7A56D6;--cr2:rgba(122,86,214,.15);--cr-forte:#5B3BB0}
+html[data-modo=escuro]{--cr:#E3A04F;--cr2:rgba(227,160,79,.2);--cr-forte:#F0B66E}
+html[data-modo=escuro][data-cor=ambar]{--cr:#A88BF0;--cr2:rgba(168,139,240,.22);--cr-forte:#C3B2FF}
+.app{padding-bottom:calc(var(--nav-alt) + 22px + env(safe-area-inset-bottom))}
+.vista{padding-top:calc(16px + env(safe-area-inset-top))}
+.toast{bottom:calc(var(--nav-alt) + 14px + env(safe-area-inset-bottom))}
+
+/* menu inferior */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:40;display:grid;grid-template-columns:repeat(5,1fr);
+  height:calc(var(--nav-alt) + env(safe-area-inset-bottom));padding:0 4px env(safe-area-inset-bottom);
+  background:var(--nav-bg);border-top:var(--nav-borda);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.nav button{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  color:var(--ink2);font-family:var(--fu);font-size:.66rem;font-weight:800;letter-spacing:.01em}
+.nav button .pil{display:grid;place-items:center;width:54px;height:29px;border-radius:999px;transition:background .15s}
+.nav button svg{width:22px;height:22px}
+.nav button.on{color:var(--ac-forte)}
+.nav button.on .pil{background:var(--ac2)}
+.nav button.on:before{content:"";position:absolute;top:0;left:30%;right:30%;height:3px;border-radius:0 0 3px 3px;background:var(--ac)}
+.nbadge{position:absolute;top:5px;left:calc(50% + 7px);min-width:17px;height:17px;padding:0 4px;border-radius:9px;
+  background:var(--perigo);color:#fff;font-style:normal;font-size:.62rem;font-weight:900;display:grid;place-items:center;line-height:1}
+.nbadge:empty{display:none}
+@media (min-width:760px){.nav{left:50%;right:auto;width:560px;transform:translateX(-50%);bottom:14px;border-radius:22px;
+  border:var(--nav-borda);box-shadow:var(--sombra-alta);height:var(--nav-alt);padding:0 6px}}
+
+/* cabeçalho de cada tela */
+.vtopo{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:16px}
+.vtopo h1{font-size:1.75rem;margin-top:3px}
+.vtopo-acoes{display:flex;gap:8px}
+.ico-r{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:var(--surf);border:var(--borda);box-shadow:var(--sombra);color:var(--ink)}
+.ico-r svg{width:20px;height:20px}
+
+/* relatório: resumo com barra empilhada campo + crédito */
+.r-resumo{padding:16px;border-radius:var(--r);background:var(--surf);border:var(--borda);box-shadow:var(--sombra);margin-bottom:12px}
+.meta-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:var(--ac2);color:var(--ac-forte);
+  font-family:var(--fu);font-size:.74rem;font-weight:800;margin-bottom:10px}
+.meta-pill u{opacity:.7;text-underline-offset:2px}
+.r-top{display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
+.r-num{display:block;font-family:var(--fd);font-size:2.5rem;line-height:1;letter-spacing:-.02em}
+.r-pct{font-family:var(--fd);font-size:1.25rem;color:var(--ac-forte)}
+.pilha{display:flex;height:12px;border-radius:99px;background:var(--surf2);overflow:hidden;margin:12px 0 10px}
+.pilha i{display:block;height:100%;transition:width .35s ease}
+.pilha .pc{background:var(--ac)}
+.pilha .pr{background:repeating-linear-gradient(-45deg,var(--cr) 0 5px,color-mix(in srgb,var(--cr) 55%,#fff) 5px 10px)}
+.leg3{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;font-family:var(--fu);font-size:.78rem;color:var(--ink2);font-weight:700}
+.leg3 b{color:var(--ink)}
+.leg3 i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.leg3 i.pc{background:var(--ac)}.leg3 i.pr{background:var(--cr)}
+.leg-falta{margin-left:auto}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.duo .btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:13px 8px;font-size:.88rem}
+.duo .btn svg{width:18px;height:18px;flex:none}
+.btn.btn-cred{background:var(--cr);color:#fff;box-shadow:0 2px 8px color-mix(in srgb,var(--cr) 35%,transparent)}
+html[data-modo=escuro] .btn.btn-cred{color:#17120a}
+.btn.btn-cred.off{background:var(--surf2);color:var(--ink2);box-shadow:none}
+.r-cal{margin-bottom:12px}
+.r-cal .mes-topo{margin:0 0 8px}
+.r-cal .escala{margin:10px 0 0}
+.cel{position:relative}
+.cel.futuro .n{opacity:.45}
+.cel.hoje{box-shadow:inset 0 0 0 2px var(--ink)}
+.cel.tem-cred:after{content:"";position:absolute;top:4px;right:4px;width:7px;height:7px;border-radius:50%;background:var(--cr);box-shadow:0 0 0 1.5px var(--surf)}
+.escala .lg-cred{display:inline-flex;align-items:center;gap:5px;margin-right:auto}
+.escala .lg-cred b{width:8px;height:8px;border-radius:50%;background:var(--cr);display:inline-block}
+.escala .vazio-esq{margin-right:auto}
+
+/* cartão de crédito de horas */
+.credcard{padding:16px;border-radius:var(--r);background:var(--surf);border:1.5px solid var(--cr2);box-shadow:var(--sombra);margin-bottom:12px}
+.credcard.bloq{border:var(--borda-tracejada)}
+.cc-top{display:flex;gap:12px;align-items:flex-start;margin-bottom:8px}
+.cc-top b{font-size:.98rem}
+.cc-top .meta{display:block;line-height:1.35;margin-top:2px;opacity:.75}
+.cc-ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--cr2);color:var(--cr-forte);flex:none}
+.cc-ic svg{width:20px;height:20px}
+.credcard.bloq .cc-ic{background:var(--surf2);color:var(--ink2)}
+.cc-tot{font-family:var(--fd);font-size:1.35rem;color:var(--cr-forte);white-space:nowrap}
+.cc-cat{border-top:var(--borda-fina);padding:10px 0 4px}
+.cc-cab{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.tag-cred{font-family:var(--fu);font-size:.72rem;font-weight:800;padding:3px 10px;border-radius:999px;background:var(--cr2);color:var(--cr-forte)}
+.cc-l{display:flex;align-items:center;gap:10px;font-size:.85rem;padding:3px 0}
+.cc-l .cc-dia{flex:1;text-align:left;opacity:.7}
+.cc-x{width:28px;height:28px;border-radius:9px;background:var(--surf2);font-size:.75rem;opacity:.75}
+.duo-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mini-card{padding:14px;border-radius:var(--r);background:var(--surf);border:var(--borda);box-shadow:var(--sombra);display:flex;flex-direction:column;gap:8px}
+.mini-card b{font-family:var(--fd);font-size:1.6rem;line-height:1}
+.mini-card .contador button{flex:1}
+
+/* folha de lançamento (campo / crédito) */
+.modo{display:grid;grid-template-columns:1fr 1fr;background:var(--surf2);border-radius:14px;padding:4px}
+.modo button{padding:10px 6px;border-radius:11px;font-weight:800;font-size:.86rem;opacity:.7}
+.modo button.on{background:var(--ac);color:var(--ac-ink);opacity:1}
+.modo button.on.cr{background:var(--cr);color:#fff}
+.modo button.dis{opacity:.4}
+.cats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cats button{text-align:left;padding:10px 12px;border-radius:14px;background:var(--surf);border:1.5px solid var(--linha)}
+.cats button b{display:block;font-size:.9rem}
+.cats button small{display:block;font-family:var(--fu);font-size:.7rem;opacity:.65;line-height:1.25;margin-top:2px}
+.cats button.on{border-color:var(--cr);background:var(--cr2)}
+.passo{display:flex;align-items:center;justify-content:center;gap:16px}
+.passo button{width:50px;height:50px;border-radius:16px;background:var(--surf2);font-size:1.5rem;font-weight:800}
+.passo b{font-family:var(--fd);font-size:2.6rem;min-width:110px;text-align:center}
+.segm4{display:flex;gap:6px}
+.segm4 button{flex:1;padding:10px 0;border-radius:12px;background:var(--surf2);font-weight:800;font-size:.84rem}
+.segm4 button.on{background:var(--ac);color:var(--ac-ink)}
+.segm4.cr button.on{background:var(--cr);color:#fff}
+.nota-cred{font-size:.82rem;padding:9px 12px;border-radius:var(--r2);background:var(--cr2);color:var(--cr-forte)}
+.dia-l{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:var(--borda-fina)}
+.dia-l:last-of-type{border-bottom:0}
+.dl-ic{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;flex:none}
+.dl-ic svg{width:19px;height:19px}
+.dl-ic.campo{background:var(--ac2);color:var(--ac-forte)}.dl-ic.cred{background:var(--cr2);color:var(--cr-forte)}
+
+/* revisitas e estudos */
+.filtros{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -16px 14px;padding:0 16px}
+.filtros::-webkit-scrollbar{display:none}
+.filtros .chip{flex:none;font-weight:700;padding:8px 14px}
+.pess{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:var(--r);background:var(--surf);border:var(--borda);
+  box-shadow:var(--sombra);margin-bottom:10px;cursor:pointer;width:100%;text-align:left}
+.av{width:42px;height:42px;border-radius:14px;flex:none;display:grid;place-items:center;background:var(--ac2);color:var(--ac-forte);font-weight:900;font-size:.92rem;font-family:var(--fu)}
+.pess-tx{flex:1;min-width:0}
+.pess-l1{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pess h3{font-family:var(--ff);font-size:1rem;font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pess .trecho{font-size:.82rem;opacity:.65;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pess .ult{font-size:.8rem;opacity:.6;margin-top:5px;font-style:italic;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.estado{flex:none;font-family:var(--fu);font-size:.7rem;font-weight:800;padding:3px 8px;border-radius:7px;background:var(--surf2);opacity:.85;white-space:nowrap}
+.estado.venc{background:rgba(196,85,63,.14);color:var(--perigo);opacity:1}
+.estado.sem{background:var(--ac2);color:var(--ac-forte);opacity:1}
+.pess-acoes{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.mini-b{padding:7px 12px;border-radius:10px;font-size:.78rem;font-weight:800;background:var(--surf2);font-family:var(--fu)}
+.mini-b.pri{background:var(--ac2);color:var(--ac-forte)}
+
+/* lembretes */
+.segm{display:grid;grid-template-columns:repeat(3,1fr);background:var(--surf2);border-radius:12px;padding:4px;margin-bottom:4px}
+.segm button{padding:8px;border-radius:9px;font-size:.84rem;font-weight:800;opacity:.65}
+.segm button.on{background:var(--surf);opacity:1;box-shadow:var(--sombra)}
+.lc{display:flex;align-items:center;gap:12px;padding:12px 14px 12px 0;border-radius:var(--r);background:var(--surf);border:var(--borda);
+  box-shadow:var(--sombra);margin-bottom:8px;overflow:hidden;cursor:pointer;width:100%;text-align:left}
+.lc-faixa{width:5px;align-self:stretch;border-radius:0 4px 4px 0;background:var(--ac);flex:none}
+.lc-faixa.atras{background:var(--perigo)}.lc-faixa.feito{background:var(--linha)}
+.lc-hora{font-family:var(--fu);font-weight:900;font-size:.95rem;width:46px;flex:none}
+.lc-tx{flex:1;min-width:0}
+.lc-tx h3{font-family:var(--ff);font-size:.95rem;font-weight:700;margin:0}
+.lc.feito .lc-tx h3,.lc.feito .lc-hora{opacity:.45}.lc.feito .lc-tx h3{text-decoration:line-through}
+.lc-ck{width:28px;height:28px;border-radius:9px;border:2px solid var(--linha-forte);display:grid;place-items:center;flex:none;color:var(--ac-ink)}
+.lc-ck.on{background:var(--ac);border-color:var(--ac)}
+.lc-ck svg{width:15px;height:15px}
+.grupo.alerta{color:var(--perigo);opacity:1}
+
+/* mais */
+.grade-mais{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:16px;border-radius:var(--r);background:var(--surf);border:var(--borda);box-shadow:var(--sombra);text-align:left}
+.tile .tic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--ac2);color:var(--ac-forte)}
+.tile .tic svg{width:21px;height:21px}
+.tile b{display:block;font-size:.95rem}
+.tile small{display:block;font-family:var(--fu);font-size:.74rem;opacity:.6}
 </style>
 </head>
 <body>
 <div class="app">
-  <header class="topo">
-    <div class="marca">
-      <span class="marca-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="var(--ac)" stroke-width="2"/><path d="M7.3 7.7c1.7-.5 3.2-.3 4.7.5v7.6c-1.5-.8-3-1-4.7-.5z" stroke="var(--ink)" stroke-width="1.4" stroke-linejoin="round"/><path d="M16.7 7.7c-1.7-.5-3.2-.3-4.7.5v7.6c1.5-.8 3-1 4.7-.5z" stroke="var(--ac)" stroke-width="1.4" stroke-linejoin="round"/></svg></span>
-      <span class="marca-txt"><b>Meu Ministério</b><small>bíblia &amp; serviço</small></span>
-    </div>
-    <div class="topo-acoes">
-      <button class="ico" data-act="busca" aria-label="Buscar">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
-      </button>
-      <button class="ico" data-act="ajustes" aria-label="Ajustes">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 3v2.2M12 18.8V21M21 12h-2.2M5.2 12H3M18.4 5.6l-1.6 1.6M7.2 16.8l-1.6 1.6M18.4 18.4l-1.6-1.6M7.2 7.2L5.6 5.6"/></svg>
-      </button>
-    </div>
-  </header>
-
   <main id="vista" class="vista"></main>
 
   <nav class="nav" id="nav" aria-label="Seções"></nav>
@@ -512,23 +643,47 @@ window.__FIREBASE_CONFIG__ = {
     return { lidos: lidos, total: total, pct: total ? Math.round(lidos * 100 / total) : 0 };
   }
 
-  /* ---------- abas: ícones, rótulos e ordem ---------- */
+  /* ---------- abas: menu inferior (Relatório, Revisitas, Estudos, Lembretes, Mais) ---------- */
   var NAVDEF = {
+    relatorio: { rot: 'Relatório', svg: '<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/>' },
+    revisitas: { rot: 'Revisitas', svg: '<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>' },
+    estudos: { rot: 'Estudos', svg: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/><path d="M9 8h6"/>' },
+    lembretes: { rot: 'Lembretes', svg: '<path d="M6.5 10a5.5 5.5 0 0 1 11 0c0 4 1.5 5.5 1.5 5.5H5s1.5-1.5 1.5-5.5z"/><path d="M10 19a2 2 0 0 0 4 0"/>' },
+    mais: { rot: 'Mais', svg: '<rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/>' },
     inicio: { rot: 'Início', svg: '<path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/>' },
     biblia: { rot: 'Bíblia', svg: '<path d="M12 6.2c-1.9-1.3-4.2-1.7-7-1.2v13c2.8-.5 5.1-.1 7 1.2V6.2z"/><path d="M12 6.2c1.9-1.3 4.2-1.7 7-1.2v13c-2.8-.5-5.1-.1-7 1.2V6.2z"/>' },
     ministerio: { rot: 'Ministério', svg: '<path d="M9 20V7a3 3 0 0 1 3-3v0a3 3 0 0 1 3 3v13"/><path d="M4 20V11a2 2 0 0 1 2-2h1M20 20V11a2 2 0 0 0-2-2h-1"/><path d="M4 20h16"/>' },
     notas: { rot: 'Notas', svg: '<path d="M4 19.5 5 15l10-10 4 4-10 10z"/><path d="M13.5 6.5 17.5 10.5"/>' },
     listas: { rot: 'Listas', svg: '<path d="M4 7.5 6 9.5 9.5 6M4 16.5 6 18.5 9.5 15M13 7.5h7M13 17h7"/>' },
-    lembretes: { rot: 'Lembretes', svg: '<path d="M6.5 10a5.5 5.5 0 0 1 11 0c0 4 1.5 5.5 1.5 5.5H5s1.5-1.5 1.5-5.5z"/><path d="M10 19a2 2 0 0 0 4 0"/>' },
     agenda: { rot: 'Agenda', svg: '<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3.5v3M16 3.5v3"/>' }
   };
+  var ABAS = ['relatorio', 'revisitas', 'estudos', 'lembretes', 'mais'];
+  var SUB_MAIS = ['biblia', 'notas', 'listas', 'agenda'];
+  // ORDEM_PADRAO fica só para compatibilidade com cópias antigas (cfg.ordem)
   var ORDEM_PADRAO = ['inicio', 'biblia', 'ministerio', 'notas', 'listas', 'lembretes', 'agenda'];
-  function ordem() { return (D.cfg.ordem && D.cfg.ordem.length === ORDEM_PADRAO.length) ? D.cfg.ordem : ORDEM_PADRAO; }
+  function ordem() { return ABAS; }
+  var ICO = {
+    enviar: '<path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/>',
+    mais: '<path d="M12 5v14M5 12h14"/>',
+    relogio: '<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6"/>',
+    busca: '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>',
+    ajustes: '<circle cx="12" cy="12" r="3.2"/><path d="M12 3v2.2M12 18.8V21M21 12h-2.2M5.2 12H3M18.4 5.6l-1.6 1.6M7.2 16.8l-1.6 1.6M18.4 18.4l-1.6-1.6M7.2 7.2L5.6 5.6"/>',
+    check: '<path d="M5 12l5 5 9-10"/>'
+  };
+  function sv(p) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>'; }
+  function icoBtn(act, path, rot) { return '<button class="ico-r" data-act="' + act + '" aria-label="' + esc(rot) + '" title="' + esc(rot) + '">' + sv(path) + '</button>'; }
+  function topoV(sup, tit, acoes) {
+    return '<div class="vtopo"><div><p class="eyebrow">' + esc(sup) + '</p><h1>' + esc(tit) + '</h1></div>' + (acoes ? '<div class="vtopo-acoes">' + acoes + '</div>' : '') + '</div>';
+  }
+  var cap = function (s) { s = String(s || ''); return s.charAt(0).toUpperCase() + s.slice(1); };
   function montaNav() {
-    $('#nav').innerHTML = ordem().map(function (k) {
-      return '<button data-vista="' + k + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' +
-        NAVDEF[k].svg + '</svg><span>' + NAVDEF[k].rot + '</span></button>';
+    $('#nav').innerHTML = ABAS.map(function (k) {
+      return '<button data-vista="' + k + '"><span class="pil">' + sv(NAVDEF[k].svg) + '</span><span>' + NAVDEF[k].rot + '</span><i class="nbadge" data-badge="' + k + '"></i></button>';
     }).join('');
+  }
+  function atualizaBadges() {
+    var b = $('[data-badge="revisitas"]'); if (b) { var n = revisitasVencidas().length; b.textContent = n ? String(n) : ''; }
+    var l = $('[data-badge="lembretes"]'); if (l) { var m = lemPendentesHoje(); l.textContent = m ? String(m) : ''; }
   }
 
   /* ---------- estado ---------- */
@@ -617,15 +772,16 @@ window.__FIREBASE_CONFIG__ = {
   /* =======================================================================
      VISÕES / troca de aba
      ======================================================================= */
-  var vistaAtual = 'inicio';
+  var vistaAtual = 'relatorio';
 
   function irPara(v, dir) {
     vistaAtual = v;
+    var aba = SUB_MAIS.indexOf(v) >= 0 ? 'mais' : v;
     $$('.nav button').forEach(function (b) {
-      var on = b.dataset.vista === v;
+      var on = b.dataset.vista === aba;
       b.classList.toggle('on', on); b.setAttribute('aria-current', on ? 'page' : 'false');
-      if (on && b.scrollIntoView) { try { b.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' }); } catch (e) { } }
     });
+    $('#nav').dataset.vista = v;
     render();
     var m = $('#vista');
     if (m && dir) {
@@ -655,7 +811,7 @@ window.__FIREBASE_CONFIG__ = {
       var dx = t.clientX - x0, dy = t.clientY - y0;
       if (Date.now() - t0 > 800) return;
       if (Math.abs(dx) < 65 || Math.abs(dx) < Math.abs(dy) * 1.6) return;
-      var o = ordem(), i = o.indexOf(vistaAtual);
+      var o = ABAS, i = o.indexOf(vistaAtual);
       if (i < 0) return;
       var j = dx < 0 ? i + 1 : i - 1;
       if (j < 0 || j >= o.length) return;
@@ -665,104 +821,48 @@ window.__FIREBASE_CONFIG__ = {
 
   function render() {
     var v = $('#vista');
-    var mapa = { inicio: vInicio, biblia: vBiblia, ministerio: vMinisterio, notas: vNotas, listas: vListas, lembretes: vLembretes, agenda: vAgenda };
-    v.innerHTML = (mapa[vistaAtual] || vInicio)();
+    var mapa = { relatorio: vRelatorio, revisitas: vRevisitas, estudos: vEstudos, lembretes: vLembretes, mais: vMais, biblia: vBiblia, notas: vNotas, listas: vListas, agenda: vAgenda };
+    var h = (mapa[vistaAtual] || vRelatorio)();
+    if (SUB_MAIS.indexOf(vistaAtual) >= 0 && !(vistaAtual === 'biblia' && bibliaLivroAtual)) h = '<button class="voltar-cat" data-vista="mais">‹ Mais</button>' + h;
+    v.innerHTML = h;
+    atualizaBadges();
   }
 
-  /* ---------- INÍCIO ---------- */
-  function saudacaoTexto() {
-    var h = new Date().getHours();
-    var t = h < 5 ? 'Boa madrugada' : h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
-    var n = D.cfg.nome;
-    return n
-      ? esc(t) + ', <button class="nome-edit" data-act="editar-nome">' + esc(n.split(' ')[0]) + '</button>.'
-      : esc(t) + '. <button class="nome-edit vazio" data-act="editar-nome">+ pôr meu nome</button>';
-  }
+  /* ---------- nome (editável em Ajustes) ---------- */
   function editorNome() {
     abreFolha('Seu nome', '<div class="form">' +
       campo('Como você quer ser chamada(o)', '<input type="text" id="nm" placeholder="Ex.: Mayara Souza" value="' + esc(D.cfg.nome || '') + '">') +
-      '<p class="dica">Aparece na saudação da tela inicial e na mensagem do relatório do mês. Dá para mudar quando quiser.</p></div>',
+      '<p class="dica">Aparece na mensagem do relatório do mês. Dá para mudar quando quiser.</p></div>',
       '<button class="btn ghost" data-fechar>Voltar</button><button class="btn" id="sv-nm">Salvar</button>');
     $('#sv-nm').onclick = function () {
       D.cfg.nome = $('#nm').value.trim(); salva(); fechaFolha(); render();
       toast(D.cfg.nome ? 'Prazer, ' + D.cfg.nome.split(' ')[0] + '.' : 'Nome removido.');
     };
   }
-  function contagemDia(iso) {
-    var n = 0;
-    n += D.estudos.filter(function (e) { return e.data === iso; }).length;
-    n += D.revisitas.filter(function (r) { return r.retorno === iso; }).length;
-    n += D.compromissos.filter(function (c) { return c.data === iso; }).length;
-    return n;
-  }
-  function tiraSemana() {
-    var base = new Date(); base.setDate(base.getDate() - base.getDay());
-    var s = '<div class="semana">';
-    for (var i = 0; i < 7; i++) {
-      var d = new Date(base.getFullYear(), base.getMonth(), base.getDate() + i);
-      var iso = new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10);
-      var n = contagemDia(iso);
-      s += '<button class="dia' + (iso === hojeISO() ? ' hoje' : '') + (n ? ' cheio' : '') + '" data-act="dia" data-dia="' + iso + '">' +
-        '<span class="ds">' + DIAS[i] + '</span><span class="dn">' + d.getDate() + '</span>' +
-        '<span class="pontos">' + (n ? new Array(Math.min(n, 3) + 1).join('<i></i>') : '') + '</span></button>';
-    }
-    return s + '</div>';
-  }
-  function vInicio() {
-    var chaveMes = hojeISO().slice(0, 7);
-    var horas = minutosDoMes(chaveMes);
-    var proximasRev = D.revisitas.filter(function (r) { return r.retorno; })
-      .sort(function (a, b) { return a.retorno.localeCompare(b.retorno); }).slice(0, 4);
-    var proximosComp = D.compromissos.filter(function (c) { return c.data && c.data >= hojeISO(); })
-      .sort(function (a, b) { return a.data.localeCompare(b.data); }).slice(0, 4);
-    var pendLem = D.lembretes.filter(function (l) { return !l.feito; }).sort(function (a, b) { return (a.quando || '').localeCompare(b.quando || ''); });
 
-    var s = '<div class="saudacao"><p class="eyebrow">' + esc(diaSemana(hojeISO())) + ' · ' + esc(dtExt(hojeISO())) + '</p>' +
-      '<h1>' + saudacaoTexto() + '</h1>' +
-      '<p class="sub">Um retrato rápido do seu ministério e do seu estudo.</p></div>';
-
-    s += '<div class="grade-kpi">' +
-      '<div class="kpi"><b>' + fmtMin(horas) + '</b><span>no campo este mês</span></div>' +
-      '<div class="kpi"><b>' + D.revisitas.length + '</b><span>revisitas anotadas</span></div>' +
-      '<div class="kpi"><b>' + D.estudos.length + '</b><span>estudos em andamento</span></div>' +
-      '<div class="kpi"><b>' + D.notas.length + '</b><span>anotações salvas</span></div>' +
-      '</div>';
-
-    s += '<div class="secao"><div class="secao-topo"><h2>Semana</h2><span class="link" data-vista="agenda">Ver agenda</span></div>' + tiraSemana() + '</div>';
-
+  /* ---------- MAIS: Bíblia, Notas, Listas, Agenda, Buscar, Ajustes ---------- */
+  function vMais() {
+    var pg = progressoTotal();
+    var proxComp = D.compromissos.filter(function (c) { return c.data && c.data >= hojeISO(); }).length;
+    var s = topoV(D.cfg.nome ? 'Olá, ' + D.cfg.nome.split(' ')[0] : 'Tudo o mais', 'Mais', icoBtn('busca', ICO.busca, 'Buscar') + icoBtn('ajustes', ICO.ajustes, 'Ajustes'));
     if (D.marcador && D.marcador.livro) {
-      var lv = livroPorNome(D.marcador.livro);
-      s += '<div class="secao"><div class="marcador-card" data-act="continuar-leitura">' +
-        '<span class="icobiblia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 6.2c-1.9-1.3-4.2-1.7-7-1.2v13c2.8-.5 5.1-.1 7 1.2V6.2z"/><path d="M12 6.2c1.9-1.3 4.2-1.7 7-1.2v13c-2.8-.5-5.1-.1-7 1.2V6.2z"/></svg></span>' +
+      s += '<div class="marcador-card" data-act="continuar-leitura">' +
+        '<span class="icobiblia">' + sv(NAVDEF.biblia.svg) + '</span>' +
         '<span class="txt"><span class="rot">Onde parei</span><h3>' + esc(D.marcador.livro) + ' ' + D.marcador.capitulo + '</h3></span>' +
-        '<button class="btn mini">Continuar</button></div></div>';
-    } else {
-      s += '<div class="secao"><div class="vazio compacto"><p>Você ainda não marcou onde parou na Bíblia.</p>' +
-        '<div class="linha-acoes" style="justify-content:center"><button class="chip" data-vista="biblia">Escolher livro</button></div></div></div>';
+        '<button class="btn mini">Continuar</button></div>';
     }
-
-    s += '<div class="secao"><div class="secao-topo"><h2>Próximas revisitas</h2><span class="link" data-act="ir-revisitas">Ver todas</span></div>';
-    if (!proximasRev.length) s += '<p class="dica">Nenhuma revisita agendada.</p>';
-    else proximasRev.forEach(function (r) { s += cardRevisita(r); });
-    s += '</div>';
-
-    s += '<div class="secao"><div class="secao-topo"><h2>Próximos compromissos</h2><span class="link" data-vista="agenda">Ver agenda</span></div>';
-    if (!proximosComp.length) s += '<p class="dica">Nenhum compromisso agendado.</p>';
-    else proximosComp.forEach(function (c) { s += cardCompromisso(c); });
-    s += '</div>';
-
-    if (pendLem.length) {
-      s += '<div class="secao"><div class="secao-topo"><h2>Lembretes</h2><span class="link" data-vista="lembretes">Ver todos</span></div>' +
-        pendLem.slice(0, 3).map(cardLembrete).join('') + '</div>';
-    }
-
-    s += '<div class="secao"><div class="secao-topo"><h2>Atalhos</h2></div><div class="atalhos">' +
-      '<button class="atalho" data-act="nova-revisita"><b>Nova revisita</b><span>nome, endereço, retorno</span></button>' +
-      '<button class="atalho" data-act="novo-estudo"><b>Novo estudo</b><span>quem você estuda com</span></button>' +
-      '<button class="atalho" data-act="nova-nota"><b>Anotação</b><span>com data e tema</span></button>' +
-      '<button class="atalho" data-act="novo-lembrete"><b>Lembrete</b><span>com aviso no celular</span></button>' +
-      '</div></div>';
-
+    var t = [
+      ['vista', 'biblia', 'Bíblia', pg.lidos ? pg.pct + '% lido' : '66 livros', NAVDEF.biblia.svg],
+      ['vista', 'notas', 'Notas', D.notas.length + (D.notas.length === 1 ? ' anotação' : ' anotações'), NAVDEF.notas.svg],
+      ['vista', 'listas', 'Listas', D.listas.length + (D.listas.length === 1 ? ' lista' : ' listas'), NAVDEF.listas.svg],
+      ['vista', 'agenda', 'Agenda', proxComp ? proxComp + (proxComp === 1 ? ' compromisso' : ' compromissos') : 'Estudos, revisitas e compromissos', NAVDEF.agenda.svg],
+      ['act', 'busca', 'Buscar', 'Uma palavra procura em tudo', ICO.busca],
+      ['act', 'ajustes', 'Ajustes', 'Conta, cores, avisos e backup', ICO.ajustes]
+    ];
+    s += '<div class="grade-mais">' + t.map(function (x) {
+      return '<button class="tile" data-' + x[0] + '="' + x[1] + '"><span class="tic">' + sv(x[4]) + '</span><span><b>' + esc(x[2]) + '</b><small>' + esc(x[3]) + '</small></span></button>';
+    }).join('') + '</div>';
+    s += '<p class="credito">Meu Ministério · desenvolvido por Alan Correa ©</p>';
     return s;
   }
 
@@ -858,7 +958,6 @@ window.__FIREBASE_CONFIG__ = {
      originais: metas de pioneiro, créditos e abonos, ano de serviço,
      gráfico de 12 meses e mensagem de relatório para o WhatsApp.
      ======================================================================= */
-  var ministerioAba = 'hub';
   var relMes = hojeISO().slice(0, 7); // 'AAAA-MM'
   var revFiltro = 'retorno';
   var obsEstudoTmp = [];
@@ -871,25 +970,6 @@ window.__FIREBASE_CONFIG__ = {
     ['especial', 'Pioneiro Especial — 100 h', 100]
   ];
   var CATS_CREDITO = [['escola', 'Escola'], ['ldc', 'LDC'], ['construcao', 'Construção'], ['outro', 'Outros']];
-
-  function vMinisterio() {
-    if (ministerioAba === 'relatorio') return vRelatorio();
-    if (ministerioAba === 'revisitas') return vRevisitas();
-    if (ministerioAba === 'estudo') return vEstudos();
-    return vMinisterioHub();
-  }
-  function irMinisterio(aba) { ministerioAba = aba; render(); window.scrollTo(0, 0); }
-
-  function vMinisterioHub() {
-    var horas = minutosDoMes(hojeISO().slice(0, 7));
-    var esperando = revisitasVencidas().length;
-    return '<div class="cabeca"><h1>Ministério</h1></div>' +
-      '<div class="livros">' +
-      '<button class="livro-btn" data-act="ir-ministerio" data-aba="relatorio" style="height:auto;padding:14px"><span>Relatório de Campo<br><span class="n" style="font-weight:400">Lance as horas do mês</span></span><span class="n">' + fmtMin(horas) + '</span></button>' +
-      '<button class="livro-btn" data-act="ir-ministerio" data-aba="revisitas" style="height:auto;padding:14px"><span>Revisitas<br><span class="n" style="font-weight:400">Quem você vai visitar de novo</span></span><span class="n">' + esperando + '</span></button>' +
-      '<button class="livro-btn" data-act="ir-ministerio" data-aba="estudo" style="height:auto;padding:14px"><span>Estudo<br><span class="n" style="font-weight:400">Quem você estuda a Bíblia com</span></span><span class="n">' + D.estudos.length + '</span></button>' +
-      '</div>';
-  }
 
   /* ---- Relatório de Campo: dados (registros achatados: d_/est_/cred_/config) ---- */
   function relAtivos() { return D.relatorio.filter(function (x) { return !x.del; }); }
@@ -957,107 +1037,126 @@ window.__FIREBASE_CONFIG__ = {
     return (av.fim * 12 + 8) - (a * 12 + m) + 1;
   }
 
+  function fmtHM(min) { min = Number(min) || 0; return Math.floor(min / 60) + ':' + String(min % 60).padStart(2, '0'); }
+  var DIAS_LONGOS = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+  function diaLongo(iso) { var p = iso.split('-'); return DIAS_LONGOS[new Date(p[0], p[1] - 1, p[2]).getDay()]; }
+  var DESC_CAT = { escola: 'Escola de pioneiro e outras escolas teocráticas', ldc: 'Depto. Local de Projeto e Construção', construcao: 'Salão do Reino, Salão de Assembleias', outro: 'Outra designação aprovada' };
+
+  /* resumo do mês: campo, crédito (só conta com meta de Regular/Especial) e meta */
+  function relResumo(mes) {
+    var cod = relConfig().meta || '', credOn = metaTemCredito(cod);
+    var mt = METAS.filter(function (m) { return m[0] === cod; })[0] || ['', 'Sem meta', 0];
+    var campoMin = minutosDoMes(mes);
+    var partes = relCatsAtivas().map(function (cid) { return [cid, creditoTotalDoMes(cid, mes)]; }).filter(function (p) { return p[1] > 0; });
+    var cred = credOn ? partes.reduce(function (t, p) { return t + p[1]; }, 0) : 0;
+    return { cod: cod, nome: mt[1].split(' — ')[0], horas: mt[2], alvo: mt[2] * 60, credOn: credOn, campo: campoMin, cred: cred, partes: partes, total: campoMin + cred };
+  }
+  function credLiberado() { return metaTemCredito(relConfig().meta || ''); }
+  function credDoDiaAtivo(rec) {
+    if (!rec) return 0; var c = creditosDoDia(rec);
+    return relCatsAtivas().reduce(function (t, cid) { return t + (Number(c[cid]) || 0); }, 0);
+  }
+  /* cada lançamento de crédito do mês: um por dia/categoria, mais o total manual antigo (sem dia) */
+  function entradasCredito(mes) {
+    var ativas = relCatsAtivas(), out = [];
+    ativas.forEach(function (cid) { var man = credManualDoMes(cid, mes); if (man) out.push({ cat: cid, iso: '', min: man }); });
+    relAtivos().filter(function (r) { return r.id.indexOf('d_') === 0 && (r.data || '').slice(0, 7) === mes; }).forEach(function (r) {
+      var c = creditosDoDia(r);
+      Object.keys(c).forEach(function (cid) { var v = Number(c[cid]) || 0; if (v > 0 && ativas.indexOf(cid) >= 0) out.push({ cat: cid, iso: r.data, min: v }); });
+    });
+    var ordemCat = CATS_CREDITO.map(function (c) { return c[0]; });
+    return out.sort(function (a, b) { return ordemCat.indexOf(a.cat) - ordemCat.indexOf(b.cat) || (a.iso || '').localeCompare(b.iso || ''); });
+  }
+
+  function cartaoCredito(R) {
+    if (!R.credOn) {
+      return '<section class="credcard bloq"><div class="cc-top"><span class="cc-ic">' + sv(ICO.mais) + '</span><div><b>Crédito de horas</b>' +
+        '<p class="meta">Disponível para Pioneiro Regular e Pioneiro Especial. Sua meta agora: ' + esc(R.alvo ? R.nome : 'sem meta') + '.</p></div></div>' +
+        '<button class="btn ghost" style="width:100%" data-act="rel-meta">Mudar meta do mês</button></section>';
+    }
+    var s = '<section class="credcard"><div class="cc-top"><span class="cc-ic">' + sv(ICO.mais) + '</span><div style="flex:1;min-width:0"><b>Crédito de horas</b>' +
+      '<p class="meta">Escola, LDC, Construção e outras designações. Somam na meta, mas vão separados no relatório.</p></div><b class="cc-tot">' + fmtHM(R.cred) + '</b></div>';
+    var ent = entradasCredito(relMes);
+    if (!ent.length) s += '<p class="dica" style="margin:4px 0 2px">Nenhum crédito lançado neste mês.</p>';
+    var grupos = {};
+    ent.forEach(function (e) { (grupos[e.cat] = grupos[e.cat] || []).push(e); });
+    Object.keys(grupos).forEach(function (cid) {
+      var arr = grupos[cid], tot = arr.reduce(function (t, e) { return t + e.min; }, 0);
+      s += '<div class="cc-cat"><div class="cc-cab"><span class="tag-cred">' + esc(relNomeCategoria(cid)) + '</span><b>' + fmtMin(tot) + '</b></div>' +
+        arr.map(function (e) {
+          var rot = e.iso ? diaSemana(e.iso) + ', ' + Number(e.iso.slice(8, 10)) + ' de ' + MES[Number(e.iso.slice(5, 7)) - 1] : 'Lançado no mês (sem dia)';
+          return '<div class="cc-l"><button class="cc-dia"' + (e.iso ? ' data-act="rel-credito" data-dia="' + e.iso + '" data-cat="' + cid + '"' : '') + '>' + esc(rot) + '</button><span>' + fmtMin(e.min) + '</span>' +
+            '<button class="cc-x" data-act="rel-cred-remover" data-dia="' + (e.iso || '') + '" data-cat="' + cid + '" aria-label="Remover crédito">✕</button></div>';
+        }).join('') + '</div>';
+    });
+    s += '<button class="btn btn-cred" style="width:100%;margin-top:10px" data-act="rel-credito">+ Adicionar crédito</button></section>';
+    return s;
+  }
+
   function vRelatorio() {
     var pm = relMes.split('-').map(Number), ano = pm[0], mes = pm[1];
     var primeiro = new Date(ano, mes - 1, 1), inicioSemana = primeiro.getDay(), qtdDias = new Date(ano, mes, 0).getDate();
-    var totalMin = minutosDoMes(relMes);
-    var cfg = relConfig(), metaCod = cfg.meta || '', credOn = metaTemCredito(metaCod);
-    var catsAtivas = relCatsAtivas();
-    var partesCred = catsAtivas.map(function (cid) { return [cid, creditoTotalDoMes(cid, relMes)]; }).filter(function (p) { return p[1] > 0; });
-    var credTotalMes = credOn ? partesCred.reduce(function (t, p) { return t + p[1]; }, 0) : 0;
-    var totalComCredito = totalMin + credTotalMes;
-    var metaHoras = (METAS.filter(function (m) { return m[0] === metaCod; })[0] || ['', '', 0])[2];
-    var alvoMin = metaHoras * 60;
-    var pct = alvoMin ? Math.min(100, Math.round(totalComCredito * 100 / alvoMin)) : 0;
-    var volta = 213.6, parteAnel = alvoMin ? Math.min(1, totalComCredito / alvoMin) : 0;
+    var R = relResumo(relMes);
+    var pct = R.alvo ? Math.min(100, Math.round(R.total * 100 / R.alvo)) : 0;
+    var base = R.alvo || R.total || 1;
+    var pc = Math.min(100, R.campo * 100 / base), pr = Math.max(0, Math.min(100 - pc, R.cred * 100 / base));
 
-    var s = '<button class="voltar-cat" data-act="fechar-ministerio">‹ Ministério</button>' +
-      '<div class="cabeca"><h1>Relatório de Campo</h1></div>';
+    var s = topoV(cap(MES[mes - 1]) + ' de ' + ano, 'Relatório', icoBtn('abrir-mensagem-mes', ICO.enviar, 'Enviar relatório do mês'));
 
-    s += '<div class="anelbox"><svg class="anel-svg" viewBox="0 0 84 84" aria-hidden="true">' +
-      '<circle class="anel-trilho" cx="42" cy="42" r="34"></circle>' +
-      '<circle class="anel-marca" cx="42" cy="42" r="34" stroke-dasharray="' + (volta * parteAnel).toFixed(1) + ' ' + volta + '" transform="rotate(-90 42 42)"></circle></svg>' +
-      '<div class="anelinfo"><span class="eyebrow">Total do mês</span><div class="anel-total">' + fmtMin(totalMin) + '</div>' +
-      '<p class="dica" style="margin-top:2px">' + (
-        !alvoMin ? 'Escolha uma meta abaixo para acompanhar quanto falta.' :
-        totalComCredito >= alvoMin ? 'Meta de ' + metaHoras + ' h alcançada. <b>' + fmtMin(totalComCredito - alvoMin) + ' acima</b> do necessário.' :
-        'Faltam <b>' + fmtMin(alvoMin - totalComCredito) + '</b> para a meta de ' + metaHoras + ' h — ' + pct + '% concluído.'
-      ) + '</p>' +
-      (credOn && partesCred.length ? '<p class="meta" style="margin-top:2px">+' + partesCred.map(function (p) { return fmtMin(p[1]) + ' ' + esc(relNomeCategoria(p[0])); }).join(', ') + ' de créditos</p>' : '') +
-      '</div></div>';
-    s += '<div class="bar"><i style="width:' + pct + '%"></i></div>';
+    s += '<section class="r-resumo"><button class="meta-pill" data-act="rel-meta">' + (R.alvo ? esc(R.nome) + ' · ' + R.horas + ' h' : 'Sem meta') + ' <u>trocar</u></button>' +
+      '<div class="r-top"><div><b class="r-num">' + fmtHM(R.total) + '</b><span class="meta">' + (R.alvo ? 'de ' + R.horas + ' h' + (R.cred ? ' · campo + crédito' : '') : 'horas no mês') + '</span></div>' +
+      (R.alvo ? '<b class="r-pct">' + pct + '%</b>' : '') + '</div>' +
+      '<div class="pilha"><i class="pc" style="width:' + pc + '%"></i>' + (R.credOn ? '<i class="pr" style="width:' + pr + '%"></i>' : '') + '</div>' +
+      '<div class="leg3"><span><i class="pc"></i>Campo <b>' + fmtHM(R.campo) + '</b></span>' +
+      (R.credOn ? '<span><i class="pr"></i>Crédito <b>' + fmtHM(R.cred) + '</b></span>' : '') +
+      (R.alvo ? '<span class="leg-falta">' + (R.total >= R.alvo ? '<b>meta alcançada</b>' : 'faltam <b>' + fmtMin(R.alvo - R.total) + '</b>') + '</span>' : '') +
+      '</div></section>';
 
-    if (metaCod === 'regular') {
+    s += '<div class="duo"><button class="btn" data-act="rel-campo">' + sv(ICO.relogio) + 'Horas de campo</button>' +
+      '<button class="btn btn-cred' + (R.credOn ? '' : ' off') + '" data-act="rel-credito">' + sv(ICO.mais) + 'Crédito de horas</button></div>';
+
+    var doMes = [], maior = 0;
+    for (var d = 1; d <= qtdDias; d++) {
+      var iso = ano + '-' + String(mes).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+      var mi = minDoDia(iso); if (mi > maior) maior = mi;
+      doMes.push([iso, mi, R.credOn ? credDoDiaAtivo(relBusca(idDiaRel(iso))) : 0]);
+    }
+    s += '<div class="calendario r-cal"><div class="mes-topo"><button class="ico" data-act="rel-mes" data-d="-1" aria-label="Mês anterior">‹</button>' +
+      '<h2>' + cap(MES[mes - 1]) + ' ' + ano + '</h2><button class="ico" data-act="rel-mes" data-d="1" aria-label="Próximo mês">›</button></div>' +
+      '<div class="cal-cab">' + DIAS.map(function (dd) { return '<span>' + dd + '</span>'; }).join('') + '</div><div class="cal-grade">';
+    for (var i = 0; i < inicioSemana; i++) s += '<span class="cel fora"></span>';
+    var hj = hojeISO();
+    doMes.forEach(function (p, ix) {
+      var nivel = '';
+      if (p[1] > 0 && maior > 0) { var f = p[1] / maior; nivel = f > .75 ? ' n4' : f > .5 ? ' n3' : f > .25 ? ' n2' : ' n1'; }
+      s += '<button class="cel' + nivel + (p[0] === hj ? ' hoje' : '') + (p[0] > hj ? ' futuro' : '') + (p[2] ? ' tem-cred' : '') + '" data-act="rel-dia" data-dia="' + p[0] + '">' +
+        '<span class="n">' + (ix + 1) + '</span>' + (p[1] ? '<span class="h">' + fmtMin(p[1]) + '</span>' : '') + '</button>';
+    });
+    s += '</div><div class="escala">' + (R.credOn ? '<span class="lg-cred"><b></b>crédito</span>' : '<span class="vazio-esq"></span>') +
+      'menos<i class="n0"></i><i class="n1"></i><i class="n2"></i><i class="n3"></i><i class="n4"></i>mais</div></div>';
+
+    s += cartaoCredito(R);
+
+    var diasComServico = doMes.filter(function (p) { return p[1] > 0; }).length;
+    s += '<div class="duo-cards"><div class="mini-card"><span class="meta">Estudos bíblicos</span><b>' + estudosDoMes(relMes) + '</b>' +
+      '<div class="contador"><button type="button" data-act="rel-estudos-menos" aria-label="Menos um">−</button><button type="button" data-act="rel-estudos-mais" aria-label="Mais um">+</button></div></div>' +
+      '<div class="mini-card"><span class="meta">Dias no campo</span><b>' + diasComServico + '</b><button class="btn ghost mini" data-act="abrir-mensagem-mes">Enviar relatório</button></div></div>';
+
+    if (R.cod === 'regular') {
       var av = anoDeServico(relMes);
       var totalAno = minutosDoAno(relMes), credAno = creditoMinutosDoAno(relMes), totalAnoComCred = totalAno + credAno;
       var alvoAno = 600 * 60, pctAno = Math.min(100, Math.round(totalAnoComCred * 100 / alvoAno));
       var restam = mesesRestantes(relMes);
-      s += '<div class="ano-box"><div class="cabeca" style="margin-bottom:6px"><b>' + fmtMin(totalAno) + '</b><span class="meta">' + esc(av.rotulo) + ' · meta de 600 h</span></div>' +
+      s += '<div class="secao"><div class="ano-box"><div class="cabeca" style="margin-bottom:6px"><b>' + fmtMin(totalAnoComCred) + '</b><span class="meta">' + esc(av.rotulo) + ' · meta de 600 h</span></div>' +
         '<div class="bar"><i style="width:' + pctAno + '%"></i></div>' +
-        (credAno > 0 ? '<p class="meta" style="margin-top:4px">Total com créditos: ' + fmtMin(totalAnoComCred) + '</p>' : '') +
+        (credAno > 0 ? '<p class="meta" style="margin-top:4px">Campo ' + fmtMin(totalAno) + ' + crédito ' + fmtMin(credAno) + '</p>' : '') +
         '<p class="dica" style="margin-top:6px">' + (
           totalAnoComCred >= alvoAno ? 'Meta anual alcançada. <b>' + fmtMin(totalAnoComCred - alvoAno) + ' acima</b> das 600 h.' :
           'Faltam <b>' + fmtMin(alvoAno - totalAnoComCred) + '</b> para as 600 h — ' + pctAno + '% do ano concluído.'
         ) + '</p>' +
         (totalAnoComCred < alvoAno ? '<p class="dica">' + (restam > 0 ? 'Contando este mês, restam ' + restam + ' ' + (restam === 1 ? 'mês' : 'meses') + ': cerca de ' + fmtMin(Math.ceil((alvoAno - totalAnoComCred) / restam)) + ' por mês.' : 'O ano de serviço já se encerrou.') + '</p>' : '') +
-        '</div>';
+        '</div></div>';
     }
-
-    s += '<div class="secao"><div class="form"><div class="dupla">' +
-      campo('Meta do mês', '<select id="rel-meta">' + METAS.map(function (m) { return '<option value="' + m[0] + '"' + (m[0] === metaCod ? ' selected' : '') + '>' + esc(m[1]) + '</option>'; }).join('') + '</select>') +
-      campo('Estudos bíblicos dirigidos no mês', '<div class="contador"><button type="button" data-act="rel-estudos-menos">−</button><input type="number" min="0" max="99" id="rel-estudos" value="' + estudosDoMes(relMes) + '"><button type="button" data-act="rel-estudos-mais">+</button></div>') +
-      '</div></div></div>';
-
-    s += '<div class="secao"><div class="secao-topo"><h2>Créditos e abonos</h2></div>' +
-      '<p class="dica">Marque as categorias que você usa. Não entram no total do mês — aparecem à parte. As horas lançadas nos dias somam aqui automaticamente.</p>' +
-      '<div class="linha-acoes" style="margin-top:10px">' + CATS_CREDITO.map(function (c) {
-        return '<button class="chip' + (catsAtivas.indexOf(c[0]) >= 0 ? ' on' : '') + '" data-act="rel-cred-toggle" data-cat="' + c[0] + '">' + esc(c[1]) + '</button>';
-      }).join('') + '</div>';
-    s += '<div class="form">';
-    if (catsAtivas.indexOf('outro') >= 0) {
-      s += '<div style="margin-top:10px">' + campo('Nome da categoria "Outros"', '<input type="text" id="rel-cred-nome" placeholder="Ex.: Construção extra" value="' + esc(cfg.credNomeOutro || '') + '">') + '</div>';
-    }
-    if (!catsAtivas.length) {
-      s += '<p class="dica" style="margin-top:10px">Marque ao menos uma categoria acima para lançar horas.</p>';
-    } else {
-      s += catsAtivas.map(function (cid) {
-        var total = creditoTotalDoMes(cid, relMes), h = total ? Math.floor(total / 60) : '', m = total % 60 ? total % 60 : '';
-        return '<div class="dupla" style="margin-top:10px">' +
-          campo(relNomeCategoria(cid) + ' — horas', '<input type="number" min="0" max="999" id="rel-credh-' + cid + '" value="' + h + '" placeholder="0">') +
-          campo(relNomeCategoria(cid) + ' — minutos', '<input type="number" min="0" max="59" step="5" id="rel-credm-' + cid + '" value="' + m + '" placeholder="0">') +
-          '</div>';
-      }).join('');
-    }
-    s += '</div></div>';
-
-    s += '<button class="btn ghost" style="width:100%;margin-top:18px" data-act="abrir-mensagem-mes">Gerar mensagem do mês</button>';
-
-    s += '<div class="mes-topo" style="margin-top:22px"><button class="ico" data-act="rel-mes" data-d="-1">‹</button>' +
-      '<h2>' + MES[mes - 1].charAt(0).toUpperCase() + MES[mes - 1].slice(1) + ' de ' + ano + '</h2>' +
-      '<button class="ico" data-act="rel-mes" data-d="1">›</button></div>';
-
-    var doMes = [];
-    for (var d = 1; d <= qtdDias; d++) {
-      var iso = ano + '-' + String(mes).padStart(2, '0') + '-' + String(d).padStart(2, '0');
-      doMes.push([iso, minDoDia(iso)]);
-    }
-    var maior = 0; doMes.forEach(function (p) { if (p[1] > maior) maior = p[1]; });
-    s += '<div class="calendario"><div class="cal-cab">' + DIAS.map(function (dd) { return '<span>' + dd + '</span>'; }).join('') + '</div><div class="cal-grade">';
-    for (var i = 0; i < inicioSemana; i++) s += '<span class="cel fora"></span>';
-    doMes.forEach(function (p, ix) {
-      var iso2 = p[0], mi = p[1], nivel = '';
-      if (mi > 0 && maior > 0) { var f = mi / maior; nivel = f > .75 ? ' n4' : f > .5 ? ' n3' : f > .25 ? ' n2' : ' n1'; }
-      s += '<button class="cel' + nivel + (iso2 === hojeISO() ? ' hoje' : '') + '" data-act="rel-dia" data-dia="' + iso2 + '">' +
-        '<span class="n">' + (ix + 1) + '</span>' + (mi ? '<span class="h">' + fmtMin(mi) + '</span>' : '') + '</button>';
-    });
-    s += '</div></div>';
-    s += '<div class="escala">menos<i class="n0"></i><i class="n1"></i><i class="n2"></i><i class="n3"></i><i class="n4"></i>mais horas</div>';
-
-    var diasComServico = doMes.filter(function (p) { return p[1] > 0; }).length;
-    var partesTxt = [diasComServico ? diasComServico + ' dia(s) com serviço neste mês' : 'Nenhum dia lançado neste mês ainda'];
-    var qtdEstudos = estudosDoMes(relMes);
-    if (qtdEstudos) partesTxt.push(qtdEstudos + ' estudo(s) bíblico(s) dirigido(s)');
-    s += '<p class="dica" style="margin-top:8px">' + esc(partesTxt.join(' · ') + '.') + '</p>';
 
     var avG = anoDeServico(relMes), mesesG = [];
     for (var g = 0; g < 12; g++) {
@@ -1066,7 +1165,7 @@ window.__FIREBASE_CONFIG__ = {
       mesesG.push([chave, MES[dref.getMonth()].slice(0, 3), minutosDoMes(chave)]);
     }
     var maiorG = 60; mesesG.forEach(function (m) { if (m[2] > maiorG) maiorG = m[2]; });
-    s += '<div class="secao"><div class="secao-topo"><h2>' + esc(avG.rotulo) + '</h2><span class="meta">' + fmtMin(minutosDoAno(relMes)) + '</span></div>' +
+    s += '<div class="secao"><div class="secao-topo"><h2>' + esc(avG.rotulo) + '</h2><span class="meta">' + fmtMin(minutosDoAno(relMes)) + ' de campo</span></div>' +
       '<div class="graf">' + mesesG.map(function (m) {
         var alt = Math.round(m[2] / maiorG * 100);
         return '<button class="graf-col' + (m[0] === relMes ? ' atual' : '') + '" data-act="ir-mes-relatorio" data-mes="' + m[0] + '" title="' + fmtMin(m[2]) + '">' +
@@ -1076,52 +1175,136 @@ window.__FIREBASE_CONFIG__ = {
     return s;
   }
 
-  function editorDiaRelatorio(iso) {
-    var r = relBusca(idDiaRel(iso));
-    var min = r ? Number(r.minutos) || 0 : 0;
-    var h = min ? Math.floor(min / 60) : '', m = min % 60 ? min % 60 : '';
-    var cfg = relConfig(), credOn = metaTemCredito(cfg.meta || ''), ativas = relCatsAtivas();
-    var corpo = '<div class="form"><p class="rotulo" style="margin:0">' + esc(dtExt(iso)) + '</p>' +
-      '<div class="dupla">' + campo('Horas', '<input type="number" min="0" id="rel-h" value="' + h + '" placeholder="0">') +
-      campo('Minutos', '<input type="number" min="0" max="59" step="5" id="rel-m" value="' + m + '" placeholder="0">') + '</div>';
-    if (credOn) {
-      if (!ativas.length) {
-        corpo += '<p class="dica">Nenhuma categoria de crédito marcada em Relatório de Campo → Créditos e abonos.</p>';
-      } else {
-        var creditosAtuais = r ? creditosDoDia(r) : {};
-        corpo += ativas.map(function (cid) {
-          var v = Number(creditosAtuais[cid]) || 0, ch = v ? Math.floor(v / 60) : '', cm = v % 60 ? v % 60 : '';
-          return '<div class="dupla">' +
-            campo(relNomeCategoria(cid) + ' — horas', '<input type="number" min="0" max="24" id="rel-diacredh-' + cid + '" value="' + ch + '" placeholder="0">') +
-            campo(relNomeCategoria(cid) + ' — min', '<input type="number" min="0" max="59" step="5" id="rel-diacredm-' + cid + '" value="' + cm + '" placeholder="0">') +
-            '</div>';
-        }).join('');
-      }
+  /* ---- folha do dia: o que foi lançado (campo + créditos) ---- */
+  function folhaDiaRel(iso) {
+    var r = relBusca(idDiaRel(iso)), min = r ? Number(r.minutos) || 0 : 0, lib = credLiberado();
+    var c = r && lib ? creditosDoDia(r) : {}, ativas = relCatsAtivas();
+    var corpo = '<div class="dia-l"><span class="dl-ic campo">' + sv(ICO.relogio) + '</span><div style="flex:1;min-width:0"><b>Horas de campo</b>' +
+      '<p class="meta">' + (min ? fmtMin(min) : 'Nada lançado') + (r && r.nota ? ' · ' + esc(r.nota) : '') + '</p></div>' +
+      '<button class="mini-b pri" data-act="rel-campo" data-dia="' + iso + '">' + (min ? 'Editar' : 'Lançar') + '</button></div>';
+    Object.keys(c).filter(function (k) { return ativas.indexOf(k) >= 0 && Number(c[k]) > 0; }).forEach(function (k) {
+      corpo += '<div class="dia-l"><span class="dl-ic cred">' + sv(ICO.mais) + '</span><div style="flex:1;min-width:0"><b>Crédito · ' + esc(relNomeCategoria(k)) + '</b>' +
+        '<p class="meta">' + fmtMin(c[k]) + '</p></div><button class="mini-b" data-act="rel-credito" data-dia="' + iso + '" data-cat="' + k + '">Editar</button></div>';
+    });
+    if (!lib) corpo += '<p class="dica">O crédito de horas fica disponível com a meta Pioneiro Regular ou Pioneiro Especial.</p>';
+    abreFolha(diaLongo(iso) + ', ' + dtExt(iso).replace(/ de \d{4}$/, ''), corpo,
+      '<button class="btn ghost" data-fechar>Fechar</button><button class="btn btn-cred' + (lib ? '' : ' off') + '" data-act="rel-credito" data-dia="' + iso + '">+ Crédito neste dia</button>');
+  }
+
+  /* ---- folha de lançamento: alterna entre Horas de campo e Crédito de horas ---- */
+  var relTmp = null;
+  function dataPadraoRel() { return hojeISO().slice(0, 7) === relMes ? hojeISO() : relMes + '-01'; }
+  function lcCaptura() {
+    if (!relTmp) return;
+    var d = $('#lc-data'); if (d && d.value) relTmp.iso = d.value;
+    var n = $('#lc-nota'); if (n) relTmp.nota = n.value;
+    var o = $('#lc-outro'); if (o) relTmp.nomeOutro = o.value;
+  }
+  function lcPreencheCampo() {
+    var r = relBusca(idDiaRel(relTmp.iso)), v = r ? Number(r.minutos) || 0 : 0;
+    relTmp.existente = v; relTmp.h = Math.floor(v / 60); relTmp.m = v % 60; relTmp.nota = r ? r.nota || '' : '';
+  }
+  function lcPreencheCred(manter) {
+    var r = relBusca(idDiaRel(relTmp.iso)), v = r ? Number(creditosDoDia(r)[relTmp.cat]) || 0 : 0;
+    relTmp.existente = v;
+    if (v || !manter) { relTmp.h = Math.floor(v / 60); relTmp.m = v % 60; }
+  }
+  function editorCampo(iso) {
+    relTmp = { modo: 'campo', iso: iso || dataPadraoRel(), cat: relCatsAtivas()[0] || 'escola', nomeOutro: relConfig().credNomeOutro || '', h: 0, m: 0, nota: '' };
+    lcPreencheCampo(); desenhaLancamento(true);
+  }
+  function editorCredito(iso, cat) {
+    if (!credLiberado()) { folhaMetaRel(true); return; }
+    relTmp = { modo: 'cred', iso: iso || dataPadraoRel(), cat: cat || relCatsAtivas()[0] || 'escola', nomeOutro: relConfig().credNomeOutro || '', h: 0, m: 0, nota: '' };
+    lcPreencheCred(false); desenhaLancamento(true);
+  }
+  function desenhaLancamento(primeira) {
+    var t = relTmp, cr = t.modo === 'cred', lib = credLiberado();
+    var mins = [0, 15, 30, 45]; if (mins.indexOf(t.m) < 0) { mins.push(t.m); mins.sort(function (a, b) { return a - b; }); }
+    var corpo = '<div class="form">' +
+      '<div class="modo"><button type="button" class="' + (cr ? '' : 'on') + '" data-act="lc-modo" data-v="campo">Horas de campo</button>' +
+      '<button type="button" class="' + (cr ? 'on cr' : '') + (lib ? '' : ' dis') + '" data-act="lc-modo" data-v="cred">Crédito de horas</button></div>' +
+      campo('Dia', '<input type="date" id="lc-data" value="' + esc(t.iso) + '">');
+    if (cr) {
+      corpo += '<p class="nota-cred">O crédito conta para a meta do mês, mas vai numa linha separada no relatório.</p>' +
+        '<div class="bloco"><span class="rotulo">Categoria</span><div class="cats">' + CATS_CREDITO.map(function (c) {
+          var nome = c[0] === 'outro' && (t.nomeOutro || '').trim() ? t.nomeOutro.trim() : c[1];
+          return '<button type="button" class="' + (t.cat === c[0] ? 'on' : '') + '" data-act="lc-cat" data-v="' + c[0] + '"><b>' + esc(nome) + '</b><small>' + esc(DESC_CAT[c[0]] || '') + '</small></button>';
+        }).join('') + '</div></div>' +
+        (t.cat === 'outro' ? campo('Nome da designação', '<input type="text" id="lc-outro" placeholder="Ex.: Betel, socorro humanitário" value="' + esc(t.nomeOutro || '') + '">') : '');
     }
-    corpo += campo('Nota do dia', '<textarea id="rel-nota" rows="2">' + esc(r ? r.nota || '' : '') + '</textarea>') + '</div>';
-    abreFolha('Lançar horas', corpo,
-      (min || (r && r.nota) ? '<button class="btn ghost perigo" id="rel-limpar">Limpar</button>' : '') +
-      '<button class="btn" id="rel-salvar">Salvar</button>');
-    $('#rel-salvar').onclick = function () {
-      var hh = Math.max(0, Number($('#rel-h').value) || 0), mm = Math.max(0, Number($('#rel-m').value) || 0);
-      var minutos = hh * 60 + mm;
-      var creditos = {}, temCredito = false;
-      if (credOn) {
-        relCatsAtivas().forEach(function (cid) {
-          var ceh = $('#rel-diacredh-' + cid), cem = $('#rel-diacredm-' + cid); if (!ceh || !cem) return;
-          var v = Math.max(0, Number(ceh.value) || 0) * 60 + Math.max(0, Number(cem.value) || 0);
-          if (v) { creditos[cid] = v; temCredito = true; }
-        });
-      }
-      var nota = ($('#rel-nota').value || '').trim();
-      var rec = (minutos || temCredito || nota)
-        ? { id: idDiaRel(iso), data: iso, minutos: minutos, creditos: creditos, nota: nota, updatedAt: agoraMs() }
-        : { id: idDiaRel(iso), del: true, updatedAt: agoraMs() };
-      relSalva(rec); fechaFolha(); render();
-      toast(minutos ? fmtMin(minutos) + ' lançado em ' + dt(iso) + '.' : (temCredito ? 'Crédito lançado em ' + dt(iso) + '.' : 'Dia sem horas.'));
+    corpo += '<div class="bloco"><span class="rotulo">Horas</span><div class="passo"><button type="button" data-act="lc-h" data-d="-1" aria-label="Menos uma hora">−</button><b>' + t.h + 'h</b>' +
+      '<button type="button" data-act="lc-h" data-d="1" aria-label="Mais uma hora">+</button></div></div>' +
+      '<div class="bloco"><span class="rotulo">Minutos</span><div class="segm4' + (cr ? ' cr' : '') + '">' + mins.map(function (v) {
+        return '<button type="button" class="' + (t.m === v ? 'on' : '') + '" data-act="lc-m" data-v="' + v + '">' + String(v).padStart(2, '0') + ' min</button>';
+      }).join('') + '</div></div>';
+    if (!cr) corpo += campo('Nota do dia (opcional)', '<textarea id="lc-nota" rows="2" placeholder="Ex.: Território 14, carrinho">' + esc(t.nota || '') + '</textarea>');
+    corpo += '</div>';
+    var tot = t.h * 60 + t.m;
+    var rod = (t.existente ? '<button class="btn ghost perigo" data-act="lc-remover">' + (cr ? 'Remover crédito' : 'Limpar dia') + '</button>' : '') +
+      '<button class="btn' + (cr ? ' btn-cred' : '') + '" data-act="lc-salvar">' + (cr ? 'Salvar crédito' : 'Salvar') + (tot ? ' · ' + fmtMin(tot) : '') + '</button>';
+    var titulo = cr ? 'Crédito de horas' : 'Horas de campo';
+    if (primeira || !$('#folha .folha-corpo')) abreFolha(titulo, corpo, rod);
+    else { $('#folha .folha-topo h2').textContent = titulo; $('#folha .folha-corpo').innerHTML = corpo; $('#folha .folha-rodape').innerHTML = rod; }
+    var d = $('#lc-data');
+    if (d) d.onchange = function () {
+      if (!d.value) return; lcCaptura();
+      if (relTmp.modo === 'cred') lcPreencheCred(true); else lcPreencheCampo();
+      desenhaLancamento();
     };
-    var lim = $('#rel-limpar');
-    if (lim) lim.onclick = function () { relSalva({ id: idDiaRel(iso), del: true, updatedAt: agoraMs() }); fechaFolha(); render(); toast('Dia limpo.'); };
+  }
+  function gravaDiaRel(iso, minutos, creditos, nota) {
+    var c = {};
+    Object.keys(creditos || {}).forEach(function (k) { var v = Number(creditos[k]) || 0; if (v > 0) c[k] = v; });
+    var tem = Object.keys(c).length > 0;
+    relSalva((minutos || tem || nota)
+      ? { id: idDiaRel(iso), data: iso, minutos: minutos, creditos: c, nota: nota || '', updatedAt: agoraMs() }
+      : { id: idDiaRel(iso), del: true, updatedAt: agoraMs() });
+  }
+  function removeCreditoDia(iso, cat) {
+    var r = relBusca(idDiaRel(iso)); if (!r) return;
+    var c0 = creditosDoDia(r), c = {};
+    Object.keys(c0).forEach(function (k) { if (k !== cat) c[k] = c0[k]; });
+    gravaDiaRel(iso, Number(r.minutos) || 0, c, r.nota || '');
+  }
+  function lcSalvar() {
+    var t = relTmp, iso = t.iso, tot = t.h * 60 + t.m;
+    if (!iso) { toast('Escolha o dia.'); return; }
+    var r = relBusca(idDiaRel(iso)), c = {}, c0 = r ? creditosDoDia(r) : {};
+    Object.keys(c0).forEach(function (k) { c[k] = c0[k]; });
+    if (t.modo === 'cred') {
+      if (!tot) { toast('Informe as horas do crédito.'); return; }
+      var nomeOutro = (t.nomeOutro || '').trim();
+      if (t.cat === 'outro' && !nomeOutro) { toast('Dê um nome para a designação.'); return; }
+      c[t.cat] = tot;
+      var patch = {}, ativas = relCatsAtivas();
+      if (ativas.indexOf(t.cat) < 0) patch.credCats = ativas.concat([t.cat]);
+      if (t.cat === 'outro' && nomeOutro !== (relConfig().credNomeOutro || '')) patch.credNomeOutro = nomeOutro;
+      if (Object.keys(patch).length) relAtualizaConfig(patch);
+      gravaDiaRel(iso, r ? Number(r.minutos) || 0 : 0, c, r ? r.nota || '' : '');
+      toast('Crédito de ' + fmtMin(tot) + ' (' + relNomeCategoria(t.cat) + ') em ' + dt(iso) + '.');
+    } else {
+      gravaDiaRel(iso, tot, c, (t.nota || '').trim());
+      toast(tot ? fmtMin(tot) + ' de campo em ' + dt(iso) + '.' : 'Dia sem horas de campo.');
+    }
+    relMes = iso.slice(0, 7);
+    fechaFolha(); render();
+  }
+  function lcRemover() {
+    var t = relTmp;
+    if (t.modo === 'cred') { removeCreditoDia(t.iso, t.cat); toast('Crédito removido.'); }
+    else { var r = relBusca(idDiaRel(t.iso)); gravaDiaRel(t.iso, 0, r ? creditosDoDia(r) : {}, ''); toast('Horas de campo do dia limpas.'); }
+    fechaFolha(); render();
+  }
+  function folhaMetaRel(aviso) {
+    var atual = relConfig().meta || '';
+    var corpo = (aviso ? '<div class="aviso"><p>O crédito de horas vale para <b>Pioneiro Regular</b> e <b>Pioneiro Especial</b>. Escolha uma dessas metas para liberar.</p></div>' : '') +
+      '<div class="menu">' + METAS.map(function (m) {
+        var c = metaTemCredito(m[0]);
+        return '<button class="' + (m[0] === atual ? 'on' : '') + '" data-act="rel-set-meta" data-meta="' + m[0] + '"><b>' + esc(m[1].split(' — ')[0]) + '</b>' +
+          '<span>' + (m[2] ? m[2] + ' h por mês' : 'Só registrar as horas') + (c ? ' · aceita crédito de horas' : '') + '</span></button>';
+      }).join('') + '</div>';
+    abreFolha('Meta do mês', corpo, '<button class="btn ghost" data-fechar>Fechar</button>');
   }
 
   function relMudaEstudos(passo) {
@@ -1155,7 +1338,8 @@ window.__FIREBASE_CONFIG__ = {
     if (nome) linhas.push(nome);
     linhas.push('');
     linhas.push('Participei no ministério: ' + (total > 0 ? 'sim' : 'não'));
-    if (total > 0) linhas.push('Horas: ' + fmtMin(total) + (credOn && partesCred.length ? ' (+' + partesCred.map(function (p) { return fmtMin(p[1]) + ' ' + relNomeCategoria(p[0]); }).join(', ') + ')' : ''));
+    if (total > 0) linhas.push('Horas: ' + fmtMin(total));
+    if (credOn && partesCred.length) linhas.push('Crédito de horas: ' + fmtMin(partesCred.reduce(function (t, p) { return t + p[1]; }, 0)) + ' (' + partesCred.map(function (p) { return fmtMin(p[1]) + ' ' + relNomeCategoria(p[0]); }).join(', ') + ')');
     if (qtd) linhas.push('Estudos bíblicos: ' + qtd);
     if (obs) { linhas.push(''); linhas.push('Observação: ' + obs); }
     return linhas.join('\n');
@@ -1238,34 +1422,32 @@ window.__FIREBASE_CONFIG__ = {
     r.retorno = somaDias(base, n); r.updatedAt = agoraMs();
     salva(); render(); toast('Retorno adiado para ' + dt(r.retorno) + '.');
   }
+  function iniciais(n) { return String(n || '?').trim().split(/\s+/).filter(function (w) { return w.length > 2 || /^[A-ZÁ-Ú]/.test(w); }).slice(0, 2).map(function (w) { return w.charAt(0); }).join('').toUpperCase() || '?'; }
   function cardRevisita(r) {
     var st = situacaoRevisita(r);
-    return '<article class="cartao" data-act="abrir-revisita" data-id="' + r.id + '">' +
-      '<div class="cartao-txt"><p class="meta' + (st.alerta ? ' alerta' : '') + '">' + esc(st.rotulo) + (r.contato ? ' · contato ' + esc(dt(r.contato)) : '') + '</p>' +
-      '<h3>' + esc(r.nome || 'Sem nome') + '</h3>' +
+    var cls = st.alerta ? 'venc' : st.ordem === 1 ? 'sem' : '';
+    return '<article class="pess" data-act="abrir-revisita" data-id="' + r.id + '"><span class="av">' + esc(iniciais(r.nome)) + '</span>' +
+      '<div class="pess-tx"><div class="pess-l1"><h3>' + esc(r.nome || 'Sem nome') + '</h3><span class="estado ' + cls + '">' + esc(st.rotulo) + '</span></div>' +
       (r.endereco ? '<p class="trecho">' + esc(r.endereco) + '</p>' : '') +
       tagsHTML(r) +
-      '<div class="linha-acoes" style="margin:8px 0 0">' +
-      '<button class="chip" data-act="voltou-hoje" data-id="' + r.id + '">Voltei hoje</button>' +
-      '<button class="chip" data-act="adiar-revisita" data-id="' + r.id + '">Adiar 7 dias</button>' +
-      '</div></div></article>';
+      '<div class="pess-acoes"><button class="mini-b pri" data-act="voltou-hoje" data-id="' + r.id + '">Voltei hoje</button>' +
+      '<button class="mini-b" data-act="adiar-revisita" data-id="' + r.id + '">Adiar 7 dias</button></div></div></article>';
   }
   function vRevisitas() {
     var rs = D.revisitas;
-    var s = '<button class="voltar-cat" data-act="fechar-ministerio">‹ Ministério</button>' +
-      '<div class="cabeca"><h1>Revisitas</h1><button class="btn" data-act="nova-revisita">Nova revisita</button></div>';
+    var s = topoV(rs.length + (rs.length === 1 ? ' pessoa' : ' pessoas'), 'Revisitas', icoBtn('nova-revisita', ICO.mais, 'Nova revisita'));
     if (!rs.length) return s + vazio('Nenhuma revisita anotada', 'Guarde nome, endereço e quando você combinou de voltar.', 'Nova revisita', 'nova-revisita');
     var vencidas = rs.filter(function (r) { return situacaoRevisita(r).ordem === 0; }).length;
     var semana = rs.filter(function (r) { return situacaoRevisita(r).ordem <= 1; }).length;
     var chips = [['retorno', 'Esperando retorno · ' + vencidas], ['semana', 'Nesta semana · ' + semana], ['todas', 'Todas · ' + rs.length]];
-    s += '<div class="linha-acoes" style="margin-bottom:14px">' + chips.map(function (c) {
+    s += '<div class="filtros">' + chips.map(function (c) {
       return '<button class="chip' + (revFiltro === c[0] ? ' on' : '') + '" data-act="rev-filtro" data-f="' + c[0] + '">' + esc(c[1]) + '</button>';
     }).join('') + '</div>';
     var lista = rs;
     if (revFiltro === 'retorno') lista = rs.filter(function (r) { return situacaoRevisita(r).ordem === 0; });
     else if (revFiltro === 'semana') lista = rs.filter(function (r) { return situacaoRevisita(r).ordem <= 1; });
     if (!lista.length) {
-      s += '<div class="vazio compacto"><h3>Nada para retornar agora</h3><p>Nenhuma revisita venceu nesta faixa. Veja todas para conferir as próximas.</p><button class="btn ghost" data-act="rev-filtro" data-f="todas">Ver todas</button></div>';
+      s += '<div class="vazio compacto"><h3>Tudo em dia</h3><p>Nenhuma revisita nesta faixa. Veja todas para conferir as próximas.</p><button class="btn ghost" data-act="rev-filtro" data-f="todas">Ver todas</button></div>';
     } else {
       lista = lista.slice().sort(function (a, b) {
         var sa = situacaoRevisita(a), sb = situacaoRevisita(b);
@@ -1307,19 +1489,34 @@ window.__FIREBASE_CONFIG__ = {
   }
 
   /* ---- Estudo ---- */
+  function rotuloDia(iso) {
+    var d = diasAte(iso);
+    if (d === 0) return 'Hoje'; if (d === 1) return 'Amanhã'; if (d === -1) return 'Ontem';
+    return diaSemana(iso) + ' ' + iso.slice(8, 10) + '/' + iso.slice(5, 7);
+  }
   function cardEstudo(e) {
-    var ponto = [e.licao ? ('Lição ' + e.licao) : '', e.ponto ? ('ponto ' + e.ponto) : ''].filter(Boolean).join(' · ');
-    return '<article class="cartao" data-act="abrir-estudo" data-id="' + e.id + '">' +
-      '<div class="cartao-txt"><p class="meta">' + (e.data ? esc(dt(e.data)) : 'Sem data') + (e.publicacao ? ' · ' + esc(e.publicacao) : '') + (ponto ? ' · ' + esc(ponto) : '') + '</p>' +
-      '<h3>' + esc(e.nome || 'Sem nome') + '</h3>' +
-      (e.endereco ? '<p class="trecho">' + esc(e.endereco) + '</p>' : '') +
-      tagsHTML(e) + '</div></article>';
+    var ponto = [e.publicacao || '', e.licao ? (/^\d+$/.test(String(e.licao).trim()) ? 'lição ' + e.licao : e.licao) : '', e.ponto ? 'ponto ' + e.ponto : ''].filter(Boolean).join(' · ');
+    var obs = (e.observacoes || []).filter(function (o) { return (o.texto || '').trim(); }).sort(function (a, b) { return (b.data || '').localeCompare(a.data || ''); })[0];
+    var dd = e.data ? diasAte(e.data) : null;
+    return '<article class="pess" data-act="abrir-estudo" data-id="' + e.id + '"><span class="av">' + esc(iniciais(e.nome)) + '</span>' +
+      '<div class="pess-tx"><div class="pess-l1"><h3>' + esc(e.nome || 'Sem nome') + '</h3>' +
+      (e.data ? '<span class="estado' + (dd !== null && dd >= 0 && dd <= 2 ? ' sem' : '') + '">' + esc(rotuloDia(e.data)) + '</span>' : '') + '</div>' +
+      (ponto ? '<p class="trecho">' + esc(ponto) + '</p>' : (e.endereco ? '<p class="trecho">' + esc(e.endereco) + '</p>' : '')) +
+      (obs ? '<p class="ult">“' + esc(obs.texto) + '”</p>' : '') +
+      tagsHTML(e) +
+      '<div class="pess-acoes"><button class="mini-b pri" data-act="est-obs" data-id="' + e.id + '">+ Observação</button>' +
+      (/^\d+$/.test(String(e.ponto || '').trim()) ? '<button class="mini-b" data-act="est-ponto" data-id="' + e.id + '">Próximo ponto</button>' : '') +
+      '</div></div></article>';
   }
   function vEstudos() {
-    var s = '<button class="voltar-cat" data-act="fechar-ministerio">‹ Ministério</button>' +
-      '<div class="cabeca"><h1>Estudo</h1><button class="btn" data-act="novo-estudo">Novo estudo</button></div>';
+    var s = topoV(D.estudos.length + (D.estudos.length === 1 ? ' estudo' : ' estudos'), 'Estudos', icoBtn('novo-estudo', ICO.mais, 'Novo estudo'));
     if (!D.estudos.length) return s + vazio('Nenhum estudo anotado', 'Guarde o nome, o contato e onde vocês pararam na publicação.', 'Novo estudo', 'novo-estudo');
-    return s + D.estudos.slice().sort(function (a, b) { return (b.data || '').localeCompare(a.data || ''); }).map(cardEstudo).join('');
+    var h = hojeISO();
+    var prox = D.estudos.filter(function (e) { return e.data && e.data >= h; }).sort(function (a, b) { return a.data.localeCompare(b.data); });
+    var resto = D.estudos.filter(function (e) { return !(e.data && e.data >= h); }).sort(function (a, b) { return (b.data || '').localeCompare(a.data || ''); });
+    if (prox.length) s += '<p class="grupo" style="margin-top:0">Próximos</p>' + prox.map(cardEstudo).join('');
+    if (resto.length) s += '<p class="grupo"' + (prox.length ? '' : ' style="margin-top:0"') + '>Último estudo</p>' + resto.map(cardEstudo).join('');
+    return s;
   }
   function renderObsEstudo() {
     var el = $('#est-obs-lista'); if (!el) return;
@@ -1455,7 +1652,6 @@ window.__FIREBASE_CONFIG__ = {
       '<div class="linha-acoes">' + [['padrao', 'Estilo padrão'], ['classica', 'Estilo clássico'], ['arredondada', 'Estilo arredondado']].map(function (o) { return '<button class="chip' + (D.cfg.fonte === o[0] ? ' on' : '') + '" data-fonte="' + o[0] + '">' + o[1] + '</button>'; }).join('') + '</div>' +
       '<hr class="linha-divisoria">' +
       '<div class="menu">' +
-      '<button data-act="ordem"><b>Ordem das abas</b><span>Escolha o que abre primeiro</span></button>' +
       '<button data-act="permitir"><b>Avisos no aparelho</b><span>Lembretes e revisitas vencidas</span></button>' +
       '<button data-act="exportar-tudo"><b>Cópia de segurança</b><span>Exportar tudo em .json</span></button>' +
       '<button data-act="importar-tudo"><b>Importar cópia</b><span>Trazer um backup .json</span></button>' +
@@ -1704,22 +1900,46 @@ window.__FIREBASE_CONFIG__ = {
      LEMBRETES — agenda de avisos geral (não ligada a revisitas), portada
      do Planejar: título, data/hora, repetição e aviso opcional no aparelho.
      ======================================================================= */
+  var lemFiltro = 'hoje';
+  var REPET = { dia: 'todo dia', semana: 'toda semana', mes: 'todo mês' };
+  function agoraLocal() { var d = new Date(); return new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 16); }
+  function lemPendentesHoje() { var h = hojeISO(); return D.lembretes.filter(function (l) { return !l.feito && l.quando && l.quando.slice(0, 10) <= h; }).length; }
   function cardLembrete(l) {
-    var atras = !l.feito && l.quando && l.quando < new Date().toISOString().slice(0, 16);
-    return '<article class="cartao" data-act="abrir-lembrete" data-id="' + l.id + '">' +
-      '<button class="marcador" style="flex:none" data-act="lembrete-toggle" data-id="' + l.id + '" aria-label="Concluído">' + (l.feito ? '✓' : '') + '</button>' +
-      '<div class="cartao-txt"><h3' + (l.feito ? ' style="opacity:.5;text-decoration:line-through"' : '') + '>' + esc(l.titulo || 'Sem título') + '</h3>' +
-      (l.quando ? '<p class="meta' + (atras ? ' alerta' : '') + '">' + esc(dt(l.quando.slice(0, 10))) + ' às ' + esc(l.quando.slice(11, 16)) + (l.repetir && l.repetir !== 'nao' ? ' · repete' : '') + '</p>' : '') +
-      '</div></article>';
+    var atras = !l.feito && l.quando && l.quando < agoraLocal();
+    var info = [l.quando ? rotuloDia(l.quando.slice(0, 10)) : 'Sem data', l.repetir && REPET[l.repetir] ? '↻ ' + REPET[l.repetir] : '', atras ? 'atrasado' : ''].filter(Boolean).join(' · ');
+    return '<article class="lc' + (l.feito ? ' feito' : '') + '" data-act="abrir-lembrete" data-id="' + l.id + '">' +
+      '<span class="lc-faixa' + (l.feito ? ' feito' : atras ? ' atras' : '') + '"></span>' +
+      '<span class="lc-hora">' + (l.quando ? esc(l.quando.slice(11, 16)) : '—') + '</span>' +
+      '<div class="lc-tx"><h3>' + esc(l.titulo || 'Sem título') + '</h3><p class="meta' + (atras ? ' alerta' : '') + '">' + esc(info) + '</p></div>' +
+      '<button class="lc-ck' + (l.feito ? ' on' : '') + '" data-act="lembrete-toggle" data-id="' + l.id + '" aria-label="' + (l.feito ? 'Desmarcar' : 'Concluir') + '">' + (l.feito ? sv(ICO.check) : '') + '</button></article>';
   }
   function vLembretes() {
-    var s = '<div class="cabeca"><h1>Lembretes</h1><button class="btn" data-act="novo-lembrete">Novo lembrete</button></div>';
+    var h = hojeISO(), pend = lemPendentesHoje();
+    var s = topoV(pend ? pend + ' para hoje' : 'Tudo em dia', 'Lembretes', icoBtn('novo-lembrete', ICO.mais, 'Novo lembrete'));
     var perm = (window.Notification && Notification.permission) || 'default';
-    if (perm !== 'granted') s += '<div class="aviso"><p>Ligue os avisos para o celular tocar na hora marcada.</p><button class="btn mini" data-act="permitir">Ligar avisos</button></div>';
+    if (perm !== 'granted' && D.lembretes.length) s += '<div class="aviso"><p>Ligue os avisos para o celular tocar na hora marcada.</p><button class="btn mini" data-act="permitir">Ligar</button></div>';
     if (!D.lembretes.length) return s + vazio('Nenhum lembrete', 'Reunião, visita marcada, entrega de relatório — marque a data e o aparelho avisa.', 'Criar lembrete', 'novo-lembrete');
-    var abertos = D.lembretes.filter(function (l) { return !l.feito; }).sort(function (a, b) { return (a.quando || '').localeCompare(b.quando || ''); });
-    var feitos = D.lembretes.filter(function (l) { return l.feito; });
-    s += abertos.map(cardLembrete).join('');
+    s += '<div class="segm">' + [['hoje', 'Hoje'], ['semana', 'Semana'], ['todos', 'Todos']].map(function (x) {
+      return '<button class="' + (lemFiltro === x[0] ? 'on' : '') + '" data-act="lem-filtro" data-f="' + x[0] + '">' + x[1] + '</button>';
+    }).join('') + '</div>';
+    var porHora = function (a, b) { return (a.quando || '9999').localeCompare(b.quando || '9999'); };
+    var dentro = function (l) {
+      if (lemFiltro === 'todos') return true;
+      if (!l.quando) return false;
+      var d = diasAte(l.quando.slice(0, 10));
+      return lemFiltro === 'hoje' ? d <= 0 : d <= 7;
+    };
+    var abertos = D.lembretes.filter(function (l) { return !l.feito && dentro(l); }).sort(porHora);
+    var atras = abertos.filter(function (l) { return l.quando && l.quando.slice(0, 10) < h; });
+    var deHoje = abertos.filter(function (l) { return l.quando && l.quando.slice(0, 10) === h; });
+    var prox = abertos.filter(function (l) { return l.quando && l.quando.slice(0, 10) > h; });
+    var semData = abertos.filter(function (l) { return !l.quando; });
+    if (atras.length) s += '<p class="grupo alerta">Atrasados · ' + atras.length + '</p>' + atras.map(cardLembrete).join('');
+    if (deHoje.length || lemFiltro === 'hoje') s += '<p class="grupo">Hoje</p>' + (deHoje.length ? deHoje.map(cardLembrete).join('') : '<p class="dica">Nada marcado para hoje.</p>');
+    if (prox.length) s += '<p class="grupo">Próximos</p>' + prox.map(cardLembrete).join('');
+    if (semData.length) s += '<p class="grupo">Sem data</p>' + semData.map(cardLembrete).join('');
+    var feitos = D.lembretes.filter(function (l) { return l.feito && (lemFiltro === 'todos' || (l.quando && l.quando.slice(0, 10) === h)); })
+      .sort(function (a, b) { return (b.quando || '').localeCompare(a.quando || ''); }).slice(0, 20);
     if (feitos.length) s += '<p class="grupo">Concluídos</p>' + feitos.map(cardLembrete).join('');
     return s;
   }
@@ -1759,7 +1979,7 @@ window.__FIREBASE_CONFIG__ = {
     });
   }
   function checaAtrasados() {
-    var agora = new Date().toISOString().slice(0, 16);
+    var agora = agoraLocal();
     var n = D.lembretes.filter(function (l) { return !l.feito && l.quando && l.quando <= agora; }).length;
     if (n) toast(n === 1 ? 'Você tem 1 lembrete vencido.' : 'Você tem ' + n + ' lembretes vencidos.', 'Ver', function () { irPara('lembretes'); });
   }
@@ -1851,9 +2071,9 @@ window.__FIREBASE_CONFIG__ = {
       case 'novo-lembrete': fechaFolha(); editorLembrete(null); break;
       case 'abrir-lembrete': editorLembrete(id); break;
       case 'lembrete-toggle': { var lt = byId(D.lembretes, id); lt.feito = !lt.feito; lt.updatedAt = agoraMs(); salva(); render(); break; }
-      case 'ir-revisitas': irPara('ministerio'); ministerioAba = 'revisitas'; render(); break;
-      case 'ir-ministerio': irMinisterio(a.dataset.aba); break;
-      case 'fechar-ministerio': ministerioAba = 'hub'; render(); break;
+      case 'ir-revisitas': irPara('revisitas'); break;
+      case 'ir-ministerio': irPara({ relatorio: 'relatorio', revisitas: 'revisitas', estudo: 'estudos' }[a.dataset.aba] || 'relatorio'); break;
+      case 'lem-filtro': lemFiltro = a.dataset.f; render(); break;
 
       case 'abrir-livro': abrirLivro(a.dataset.livro); break;
       case 'fechar-livro': bibliaLivroAtual = null; render(); break;
@@ -1862,7 +2082,35 @@ window.__FIREBASE_CONFIG__ = {
 
       case 'rel-mes': { var pmm = relMes.split('-').map(Number); var dtm = new Date(pmm[0], pmm[1] - 1 + Number(a.dataset.d), 1); relMes = dtm.getFullYear() + '-' + String(dtm.getMonth() + 1).padStart(2, '0'); render(); break; }
       case 'ir-mes-relatorio': relMes = a.dataset.mes; render(); break;
-      case 'rel-dia': editorDiaRelatorio(a.dataset.dia); break;
+      case 'rel-dia': folhaDiaRel(a.dataset.dia); break;
+      case 'rel-campo': fechaFolha(); editorCampo(a.dataset.dia || null); break;
+      case 'rel-credito': fechaFolha(); editorCredito(a.dataset.dia || null, a.dataset.cat || null); break;
+      case 'rel-meta': folhaMetaRel(false); break;
+      case 'rel-set-meta': {
+        var codM = a.dataset.meta || ''; relAtualizaConfig({ meta: codM }); fechaFolha(); render();
+        var mM = METAS.filter(function (m) { return m[0] === codM; })[0] || ['', 'Sem meta'];
+        toast(codM ? 'Meta: ' + mM[1].split(' — ')[0] + (metaTemCredito(codM) ? ' · crédito de horas liberado' : '') : 'Meta desligada.');
+        break;
+      }
+      case 'rel-cred-remover': {
+        var diaC = a.dataset.dia, catC = a.dataset.cat;
+        pergunta('Remover este crédito de ' + relNomeCategoria(catC) + '?', function () {
+          if (diaC) removeCreditoDia(diaC, catC);
+          else relSalva({ id: idCredMes(catC, relMes), del: true, updatedAt: agoraMs() });
+          render(); toast('Crédito removido.');
+        }, 'Remover');
+        break;
+      }
+      case 'lc-modo':
+        lcCaptura();
+        if (a.dataset.v === 'cred' && !credLiberado()) { folhaMetaRel(true); break; }
+        if (relTmp.modo !== a.dataset.v) { relTmp.modo = a.dataset.v; if (relTmp.modo === 'cred') lcPreencheCred(false); else lcPreencheCampo(); desenhaLancamento(); }
+        break;
+      case 'lc-cat': lcCaptura(); relTmp.cat = a.dataset.v; lcPreencheCred(true); desenhaLancamento(); break;
+      case 'lc-h': lcCaptura(); relTmp.h = Math.max(0, Math.min(24, relTmp.h + Number(a.dataset.d))); desenhaLancamento(); break;
+      case 'lc-m': lcCaptura(); relTmp.m = Number(a.dataset.v); desenhaLancamento(); break;
+      case 'lc-salvar': lcCaptura(); lcSalvar(); break;
+      case 'lc-remover': lcCaptura(); lcRemover(); break;
       case 'rel-cred-toggle': { var catsA = relCatsAtivas(), cidT = a.dataset.cat; var novasC = catsA.indexOf(cidT) >= 0 ? catsA.filter(function (x) { return x !== cidT; }) : catsA.concat([cidT]); relAtualizaConfig({ credCats: novasC }); render(); break; }
       case 'rel-estudos-menos': relMudaEstudos(-1); break;
       case 'rel-estudos-mais': relMudaEstudos(1); break;
@@ -1877,6 +2125,18 @@ window.__FIREBASE_CONFIG__ = {
       case 'adiar-revisita': adiarRevisita(id, 7); break;
       case 'novo-estudo': fechaFolha(); editorEstudo(null); break;
       case 'abrir-estudo': editorEstudo(id); break;
+      case 'est-obs': {
+        editorEstudo(id); acrescentarObsEstudo();
+        var obsIn = $$('#est-obs-lista [data-obs-texto]'); var ultIn = obsIn[obsIn.length - 1];
+        if (ultIn) { try { ultIn.scrollIntoView({ block: 'center' }); ultIn.focus(); } catch (e) { } }
+        break;
+      }
+      case 'est-ponto': {
+        var eP = byId(D.estudos, id); if (!eP) break;
+        eP.ponto = String((Number(eP.ponto) || 0) + 1); eP.updatedAt = agoraMs(); salva(); render();
+        toast((eP.nome || 'Estudo').split(' ')[0] + ': agora no ponto ' + eP.ponto + '.');
+        break;
+      }
       case 'obs-add': acrescentarObsEstudo(); break;
       case 'obs-remover': removerObsEstudo(Number(a.dataset.ix)); break;
 
@@ -1956,7 +2216,7 @@ window.__FIREBASE_CONFIG__ = {
   function iniciar() {
     if (iniciado) return; iniciado = true;
     carrega(); aplicaCfg(); montaNav();
-    irPara(ordem()[0]);
+    irPara('relatorio');
     avisarRevisitas();
     agendaAvisos();
     checaAtrasados();
@@ -1969,10 +2229,11 @@ window.__FIREBASE_CONFIG__ = {
     var acao = m[1];
     if (history.replaceState) history.replaceState(null, '', location.pathname);
     setTimeout(function () {
-      if (acao === 'nova-revisita') { irPara('ministerio'); ministerioAba = 'revisitas'; render(); editorRevisita(null); }
-      else if (acao === 'novo-estudo') { irPara('ministerio'); ministerioAba = 'estudo'; render(); editorEstudo(null); }
-      else if (acao === 'nova-nota') editorNota(null);
-      else if (acao === 'relatorio') { irPara('ministerio'); ministerioAba = 'relatorio'; render(); }
+      if (acao === 'nova-revisita') { irPara('revisitas'); editorRevisita(null); }
+      else if (acao === 'novo-estudo') { irPara('estudos'); editorEstudo(null); }
+      else if (acao === 'nova-nota') { irPara('notas'); editorNota(null); }
+      else if (acao === 'relatorio') irPara('relatorio');
+      else if (acao === 'lancar-horas') { irPara('relatorio'); editorCampo(hojeISO()); }
       else if (acao === 'biblia') irPara('biblia');
       else if (acao === 'novo-lembrete') { irPara('lembretes'); editorLembrete(null); }
       else if (acao === 'agenda') irPara('agenda');
@@ -1988,8 +2249,9 @@ window.__FIREBASE_CONFIG__ = {
 <script>
 /* ==========================================================================
    Botão de voltar do celular — mesma lógica do Planejar:
-   camadas (folha/leitura) fecham primeiro; fora do Início, volta ao Início;
-   já no Início, exige um segundo toque para sair do app.
+   camadas (folha/leitura) fecham primeiro; depois volta pela trilha de
+   telas; no fim, volta ao Relatório; já no Relatório, exige um segundo
+   toque para sair do app.
    ========================================================================== */
 (function () {
   'use strict';
@@ -2031,7 +2293,8 @@ window.__FIREBASE_CONFIG__ = {
   }
   CAMADAS.forEach(vigia);
 
-  function vistaDaNav() { var b = document.querySelector('.nav button.on'); return b ? b.dataset.vista : null; }
+  function vistaDaNav() { var n = document.getElementById('nav'); return n && n.dataset.vista ? n.dataset.vista : null; }
+  var SUBS = ['biblia', 'notas', 'listas', 'agenda'];
   var nav = document.getElementById('nav');
   if (nav) {
     vistaAtual = vistaDaNav();
@@ -2040,12 +2303,13 @@ window.__FIREBASE_CONFIG__ = {
       if (!nova || nova === vistaAtual) return;
       var de = vistaAtual; vistaAtual = nova;
       if (!voltando && de) empilha({ tipo: 'vista', de: de });
-    }).observe(nav, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
+    }).observe(nav, { attributes: true, attributeFilter: ['data-vista'] });
   }
   function vaiPara(v) { voltando = true; if (window.Ministerio && window.Ministerio.ir) window.Ministerio.ir(v); setTimeout(function () { voltando = false; }, 0); }
 
   function fimDaPilha() {
-    if (vistaAtual && vistaAtual !== 'inicio') { guarda(); vaiPara('inicio'); return; }
+    if (vistaAtual && SUBS.indexOf(vistaAtual) >= 0) { guarda(); vaiPara('mais'); return; }
+    if (vistaAtual && vistaAtual !== 'relatorio') { guarda(); vaiPara('relatorio'); return; }
     if (Date.now() - avisoSaida < 2500) { try { history.back(); } catch (e) { } return; }
     avisoSaida = Date.now();
     if (window.Ministerio && window.Ministerio.aviso) window.Ministerio.aviso('Toque em voltar de novo para sair.');
